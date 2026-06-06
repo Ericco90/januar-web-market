@@ -54,7 +54,19 @@ async function fetchPost(action, payload, token = null) {
 
 // Exported API Functions
 const API = {
-  getProducts: () => fetchGet('getProducts'),
+  getProducts: async () => {
+    const res = await fetchGet('getProducts');
+    if (res.status === 'success' && res.data) {
+      res.data = res.data.map(p => {
+        if (p.thumbnail && p.thumbnail.includes('drive.google.com/uc')) {
+          const match = p.thumbnail.match(/id=([^&]+)/);
+          if (match) p.thumbnail = 'https://lh3.googleusercontent.com/d/' + match[1];
+        }
+        return p;
+      });
+    }
+    return res;
+  },
   getTestimonials: () => fetchGet('getTestimonials'),
   getSettings: () => fetchGet('getSettings'),
   createOrder: (data) => fetchPost('createOrder', data),
