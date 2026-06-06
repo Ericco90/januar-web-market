@@ -141,49 +141,80 @@
   <script src="assets/js/api.js"></script>
   <script src="assets/js/main.js"></script>
   <script>
-    document.addEventListener('DOMContentLoaded', async () => {
-      // Fetch Products
-      const res = await API.getProducts();
+    function renderFeaturedProducts(data) {
       const container = document.getElementById('featured-products');
-      
-      if(res.status === 'success' && res.data) {
-        // Show only max 6 items for featured
-        const items = res.data.slice(0, 6);
-        container.innerHTML = items.map(p => `
-          <div class="product-card">
-            <img src="${p.thumbnail || 'https://via.placeholder.com/400x250?text=No+Image'}" alt="${p.nama}" class="product-img">
-            <div class="product-content">
-              <span class="product-category">${p.kategori}</span>
-              <h3 class="product-title">${p.nama}</h3>
-              <div class="product-price">${formatRupiah(p.harga)}</div>
-              <a href="product-detail.html?id=${p.id}" class="btn btn-outline" style="width: 100%;">Detail Produk</a>
+      const items = data.slice(0, 6);
+      container.innerHTML = items.map(p => `
+        <div class="product-card">
+          <img src="${p.thumbnail || 'https://via.placeholder.com/400x250?text=No+Image'}" alt="${p.nama}" class="product-img" loading="lazy">
+          <div class="product-content">
+            <span class="product-category">${p.kategori}</span>
+            <h3 class="product-title">${p.nama}</h3>
+            <div class="product-price">${formatRupiah(p.harga)}</div>
+            <a href="product-detail.html?id=${p.id}" class="btn btn-outline" style="width: 100%;">Detail Produk</a>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function renderTestimonialsList(data) {
+      const tContainer = document.getElementById('testimonials');
+      tContainer.innerHTML = data.map(t => `
+        <div style="background: var(--surface-color); padding: 2rem; border-radius: var(--radius); border: 1px solid var(--border-color); box-shadow: var(--card-shadow);">
+          <div style="display: flex; gap: 1rem; align-items: center; margin-bottom: 1rem;">
+            <img src="${t.foto || 'https://via.placeholder.com/50'}" alt="${t.nama}" style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover;" loading="lazy">
+            <div>
+              <h4 style="margin: 0;">${t.nama}</h4>
+              <div style="color: #F59E0B; font-size: 0.875rem;"><i class="ri-star-fill"></i><i class="ri-star-fill"></i><i class="ri-star-fill"></i><i class="ri-star-fill"></i><i class="ri-star-fill"></i></div>
             </div>
           </div>
-        `).join('');
+          <p style="color: var(--text-muted); font-size: 0.95rem;">"${t.isi}"</p>
+        </div>
+      `).join('');
+    }
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      // Skeletons are defined in CSS now, but for simple HTML we can use the default loader or inject skeleton HTML
+      const container = document.getElementById('featured-products');
+      container.innerHTML = Array(6).fill(`
+        <div class="product-card skeleton-card">
+          <div class="skeleton-img skeleton"></div>
+          <div class="product-content">
+            <div class="skeleton-text short skeleton" style="margin-bottom: 0.5rem;"></div>
+            <div class="skeleton-text skeleton" style="margin-bottom: 1rem; height: 28px;"></div>
+            <div class="skeleton-text skeleton" style="margin-top: auto; height: 30px;"></div>
+          </div>
+        </div>
+      `).join('');
+
+      // Fetch Products (Instantly from cache if available)
+      const res = await API.getProducts();
+      if(res.status === 'success' && res.data) {
+        renderFeaturedProducts(res.data);
       } else {
         container.innerHTML = '<p style="text-align:center; width:100%; grid-column: 1/-1;">Gagal memuat produk.</p>';
       }
 
+      // Listen for background updates
+      document.addEventListener('productsUpdated', (e) => {
+        if(e.detail.status === 'success' && e.detail.data) {
+          renderFeaturedProducts(e.detail.data);
+        }
+      });
+
       // Fetch Testimonials
       const tRes = await API.getTestimonials();
-      const tContainer = document.getElementById('testimonials');
-      
       if(tRes.status === 'success' && tRes.data) {
-        tContainer.innerHTML = tRes.data.map(t => `
-          <div style="background: var(--surface-color); padding: 2rem; border-radius: var(--radius); border: 1px solid var(--border-color); box-shadow: var(--card-shadow);">
-            <div style="display: flex; gap: 1rem; align-items: center; margin-bottom: 1rem;">
-              <img src="${t.foto || 'https://via.placeholder.com/50'}" alt="${t.nama}" style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover;">
-              <div>
-                <h4 style="margin: 0;">${t.nama}</h4>
-                <div style="color: #F59E0B; font-size: 0.875rem;"><i class="ri-star-fill"></i><i class="ri-star-fill"></i><i class="ri-star-fill"></i><i class="ri-star-fill"></i><i class="ri-star-fill"></i></div>
-              </div>
-            </div>
-            <p style="color: var(--text-muted); font-size: 0.95rem;">"${t.isi}"</p>
-          </div>
-        `).join('');
+        renderTestimonialsList(tRes.data);
       } else {
-        tContainer.innerHTML = '<p>Belum ada testimoni.</p>';
+        document.getElementById('testimonials').innerHTML = '<p>Belum ada testimoni.</p>';
       }
+
+      document.addEventListener('testimonialsUpdated', (e) => {
+        if(e.detail.status === 'success' && e.detail.data) {
+          renderTestimonialsList(e.detail.data);
+        }
+      });
     });
   </script>
 </body>

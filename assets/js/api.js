@@ -54,20 +54,39 @@ async function fetchPost(action, payload, token = null) {
 
 // Exported API Functions
 const API = {
-  getProducts: async () => {
-    const res = await fetchGet('getProducts');
-    if (res.status === 'success' && res.data) {
-      res.data = res.data.map(p => {
-        if (p.thumbnail && p.thumbnail.includes('drive.google.com/uc')) {
-          const match = p.thumbnail.match(/id=([^&]+)/);
-          if (match) p.thumbnail = 'https://lh3.googleusercontent.com/d/' + match[1];
-        }
-        return p;
-      });
-    }
-    return res;
+  getProducts: async (forceFetch = false) => {
+    const cached = localStorage.getItem('januar_products');
+    
+    const bgFetch = fetchGet('getProducts').then(res => {
+      if (res.status === 'success' && res.data) {
+        res.data = res.data.map(p => {
+          if (p.thumbnail && p.thumbnail.includes('drive.google.com/uc')) {
+            const match = p.thumbnail.match(/id=([^&]+)/);
+            if (match) p.thumbnail = 'https://lh3.googleusercontent.com/d/' + match[1];
+          }
+          return p;
+        });
+        localStorage.setItem('januar_products', JSON.stringify(res));
+        document.dispatchEvent(new CustomEvent('productsUpdated', {detail: res}));
+      }
+      return res;
+    });
+
+    if (cached && !forceFetch) return JSON.parse(cached);
+    return await bgFetch;
   },
-  getTestimonials: () => fetchGet('getTestimonials'),
+  getTestimonials: async (forceFetch = false) => {
+    const cached = localStorage.getItem('januar_testimonials');
+    const bgFetch = fetchGet('getTestimonials').then(res => {
+      if(res.status === 'success') {
+        localStorage.setItem('januar_testimonials', JSON.stringify(res));
+        document.dispatchEvent(new CustomEvent('testimonialsUpdated', {detail: res}));
+      }
+      return res;
+    });
+    if(cached && !forceFetch) return JSON.parse(cached);
+    return await bgFetch;
+  },
   getSettings: () => fetchGet('getSettings'),
   createOrder: (data) => fetchPost('createOrder', data),
   

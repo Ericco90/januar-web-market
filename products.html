@@ -73,14 +73,32 @@
     let allProducts = [];
 
     document.addEventListener('DOMContentLoaded', async () => {
+      const container = document.getElementById('products-grid');
+      container.innerHTML = Array(8).fill(`
+        <div class="product-card skeleton-card">
+          <div class="skeleton-img skeleton"></div>
+          <div class="product-content">
+            <div class="skeleton-text short skeleton" style="margin-bottom: 0.5rem;"></div>
+            <div class="skeleton-text skeleton" style="margin-bottom: 1rem; height: 28px;"></div>
+            <div class="skeleton-text skeleton" style="margin-top: auto; height: 30px;"></div>
+          </div>
+        </div>
+      `).join('');
+
       const res = await API.getProducts();
-      
       if(res.status === 'success' && res.data) {
         allProducts = res.data.filter(p => p.status === 'Aktif');
-        renderProducts(allProducts);
+        applyFilters(); // apply filters handles rendering
       } else {
-        document.getElementById('products-grid').innerHTML = '<p>Gagal memuat produk.</p>';
+        container.innerHTML = '<p>Gagal memuat produk.</p>';
       }
+
+      document.addEventListener('productsUpdated', (e) => {
+        if(e.detail.status === 'success' && e.detail.data) {
+          allProducts = e.detail.data.filter(p => p.status === 'Aktif');
+          applyFilters();
+        }
+      });
 
       setupFilters();
     });
@@ -95,7 +113,7 @@
       container.innerHTML = products.map(p => `
         <div class="product-card">
           <div style="position: relative;">
-            <img src="${p.thumbnail || 'https://via.placeholder.com/400x250'}" alt="${p.nama}" class="product-img">
+            <img src="${p.thumbnail || 'https://via.placeholder.com/400x250'}" alt="${p.nama}" class="product-img" loading="lazy">
             ${p.bestseller ? '<span style="position: absolute; top: 1rem; left: 1rem; background: #EF4444; color: white; padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.75rem; font-weight: bold;">Bestseller</span>' : ''}
           </div>
           <div class="product-content">
@@ -108,6 +126,7 @@
       `).join('');
     }
 
+    let applyFilters;
     function setupFilters() {
       const searchInput = document.getElementById('searchInput');
       const sortSelect = document.getElementById('sortSelect');
@@ -124,7 +143,7 @@
         if(activeBtn) activeBtn.classList.add('active');
       }
 
-      const applyFilters = () => {
+      applyFilters = () => {
         let filtered = [...allProducts];
 
         if(currentCat !== 'all') {
