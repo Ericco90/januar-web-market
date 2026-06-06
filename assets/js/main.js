@@ -1,10 +1,6 @@
 // File: assets/js/main.js
 
-document.addEventListener('DOMContentLoaded', () => {
-  initTheme();
-  initMobileMenu();
-  loadCommonElements();
-});
+
 
 // Theme Management
 function initTheme() {
