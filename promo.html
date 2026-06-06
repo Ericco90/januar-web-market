@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Flash Sale - Januar Web</title>
+  <link rel="stylesheet" href="assets/css/style.css">
+  <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+</head>
+<body>
+  <header class="glass">
+    <div class="container navbar">
+      <a href="index.html" class="logo">
+        <i class="ri-store-2-line"></i> Januar Web
+      </a>
+      <nav class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="products.html">Produk</a>
+        <a href="promo.html" style="color: var(--danger); font-weight: bold;"><i class="ri-flashlight-fill"></i> Flash Sale</a>
+        <a href="how-to-buy.html">Cara Beli</a>
+        <a href="track.html">Lacak</a>
+      </nav>
+      <div class="nav-actions">
+        <div class="cart-icon-wrapper" onclick="toggleCart()">
+          <i class="ri-shopping-cart-2-line"></i>
+          <span class="cart-badge" id="cart-badge">0</span>
+        </div>
+        <button id="theme-toggle" class="theme-toggle"><i class="ri-moon-line"></i></button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container" style="padding: 6rem 1.5rem 4rem; min-height: 80vh;">
+    <!-- Countdown Banner -->
+    <div style="background: linear-gradient(135deg, var(--danger), #B91C1C); color: white; padding: 3rem 2rem; border-radius: var(--radius); text-align: center; margin-bottom: 3rem; box-shadow: var(--card-shadow);">
+      <h1 style="margin-bottom: 1rem; font-size: 2.5rem;"><i class="ri-flashlight-fill" style="color: #FCD34D;"></i> FLASH SALE!</h1>
+      <p style="font-size: 1.1rem; margin-bottom: 2rem;">Diskon gila-gilaan untuk produk pilihan. Berakhir dalam:</p>
+      <div style="display: flex; justify-content: center; gap: 1rem;">
+        <div style="background: rgba(255,255,255,0.2); padding: 1rem; border-radius: 8px; min-width: 80px;">
+          <div id="cd-days" style="font-size: 2rem; font-weight: bold;">02</div>
+          <div style="font-size: 0.8rem; text-transform: uppercase;">Hari</div>
+        </div>
+        <div style="background: rgba(255,255,255,0.2); padding: 1rem; border-radius: 8px; min-width: 80px;">
+          <div id="cd-hours" style="font-size: 2rem; font-weight: bold;">14</div>
+          <div style="font-size: 0.8rem; text-transform: uppercase;">Jam</div>
+        </div>
+        <div style="background: rgba(255,255,255,0.2); padding: 1rem; border-radius: 8px; min-width: 80px;">
+          <div id="cd-mins" style="font-size: 2rem; font-weight: bold;">30</div>
+          <div style="font-size: 0.8rem; text-transform: uppercase;">Menit</div>
+        </div>
+        <div style="background: rgba(255,255,255,0.2); padding: 1rem; border-radius: 8px; min-width: 80px;">
+          <div id="cd-secs" style="font-size: 2rem; font-weight: bold;">45</div>
+          <div style="font-size: 0.8rem; text-transform: uppercase;">Detik</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Promo Products Grid -->
+    <div id="promo-grid" class="grid">
+      <div class="loader-container" style="grid-column: 1/-1;"><div class="loader"></div></div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container footer-content">
+      <div>
+        <a href="index.html" class="logo" style="margin-bottom: 1rem;">
+          <i class="ri-store-2-line"></i> Januar Web
+        </a>
+        <p style="color: var(--text-muted); max-width: 300px;">Solusi terbaik untuk aset digital berkualitas tinggi yang mempercepat alur kerja Anda.</p>
+      </div>
+      <div>
+        <h3 style="margin-bottom: 1rem; font-size: 1.1rem;">Hubungi Kami</h3>
+        <div style="color: var(--text-muted); display: flex; flex-direction: column; gap: 0.5rem;">
+          <a href="https://wa.me/6285641612901"><i class="ri-whatsapp-line"></i> +62 856-4161-2901</a>
+          <a href="mailto:support@januarweb.com"><i class="ri-mail-line"></i> support@januarweb.com</a>
+        </div>
+      </div>
+      <div>
+        <h3 style="margin-bottom: 1rem; font-size: 1.1rem;">Pembayaran Aman</h3>
+        <div class="trust-badges">
+          <div class="trust-badge"><i class="ri-bank-card-line" style="color: #005E6A;"></i> BCA</div>
+          <div class="trust-badge"><i class="ri-bank-fill" style="color: #003D79;"></i> Mandiri</div>
+          <div class="trust-badge"><i class="ri-qr-code-line" style="color: #ED1C24;"></i> QRIS</div>
+          <div class="trust-badge"><i class="ri-wallet-3-line" style="color: #00AED6;"></i> GoPay</div>
+          <div class="trust-badge"><i class="ri-wallet-3-fill" style="color: #4C3494;"></i> OVO</div>
+        </div>
+      </div>
+    </div>
+    <div class="container" style="text-align: center; margin-top: 3rem; color: var(--text-muted); font-size: 0.875rem;">
+      &copy; 2026 Januar Web Brebes. | <a href="admin/login.html" style="color: inherit; text-decoration: none;"><i class="ri-shield-keyhole-line"></i> Login Admin</a>
+    </div>
+  </footer>
+
+  <!-- Shopping Cart Sidebar -->
+  <div class="cart-overlay" id="cart-overlay" onclick="toggleCart()"></div>
+  <div class="cart-sidebar" id="cart-sidebar">
+    <div class="cart-header">
+      <h3>Keranjang Belanja</h3>
+      <button class="cart-close" onclick="toggleCart()"><i class="ri-close-line"></i></button>
+    </div>
+    <div class="cart-items" id="cart-items"></div>
+    <div class="cart-footer">
+      <div class="cart-total">
+        <span>Total:</span>
+        <span id="cart-total-price">Rp 0</span>
+      </div>
+      <button class="btn btn-primary" style="width: 100%;" onclick="checkoutCart()">Checkout Sekarang</button>
+    </div>
+  </div>
+
+  <div class="toast-container" id="toast-container"></div>
+
+  <script src="assets/js/api.js"></script>
+  <script src="assets/js/main.js"></script>
+  <script>
+    // Countdown Timer Logic
+    const countDownDate = new Date().getTime() + (2 * 24 * 60 * 60 * 1000) + (14 * 60 * 60 * 1000); // 2 days 14 hours from now
+    setInterval(function() {
+      const now = new Date().getTime();
+      const distance = countDownDate - now;
+      if (distance < 0) return;
+      document.getElementById("cd-days").innerText = String(Math.floor(distance / (1000 * 60 * 60 * 24))).padStart(2, '0');
+      document.getElementById("cd-hours").innerText = String(Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))).padStart(2, '0');
+      document.getElementById("cd-mins").innerText = String(Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60))).padStart(2, '0');
+      document.getElementById("cd-secs").innerText = String(Math.floor((distance % (1000 * 60)) / 1000)).padStart(2, '0');
+    }, 1000);
+
+    // Fetch and render products
+    document.addEventListener('DOMContentLoaded', async () => {
+      const container = document.getElementById('promo-grid');
+      const res = await API.getProducts();
+      
+      if(res.status === 'success' && res.data) {
+        // Just pick top 4 products for promo display
+        const promoProducts = res.data.filter(p => p.status === 'Aktif').slice(0, 4);
+        if(promoProducts.length === 0) {
+          container.innerHTML = '<p style="grid-column: 1/-1; text-align: center;">Tidak ada promo saat ini.</p>';
+          return;
+        }
+
+        container.innerHTML = promoProducts.map(p => `
+          <div class="product-card" style="border: 2px solid var(--danger);">
+            <div style="position: relative;">
+              <img src="${p.thumbnail || 'https://via.placeholder.com/400x250'}" alt="${p.nama}" class="product-img" loading="lazy">
+              <span style="position: absolute; top: 1rem; left: 1rem; background: var(--danger); color: white; padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.75rem; font-weight: bold;"><i class="ri-flashlight-fill"></i> Flash Sale</span>
+            </div>
+            <div class="product-content">
+              <span class="product-category">${p.kategori}</span>
+              <h3 class="product-title">${p.nama}</h3>
+              <div style="display: flex; gap: 0.5rem; align-items: center; margin-bottom: 0.5rem;">
+                <div style="color: var(--danger); font-weight: bold; font-size: 1.25rem;">${formatRupiah(p.harga)}</div>
+                <div style="color: var(--text-muted); text-decoration: line-through; font-size: 0.9rem;">${formatRupiah(parseInt(p.harga) * 1.5)}</div>
+              </div>
+              <div style="display: flex; gap: 0.5rem;">
+                <a href="product-detail.html?id=${p.id}" class="btn btn-outline" style="flex: 1; padding: 0.5rem;"><i class="ri-eye-line"></i> Detail</a>
+                <button class="btn btn-primary" style="flex: 1; padding: 0.5rem; background: var(--danger); border-color: var(--danger);" onclick="addToCart('${p.id}', '${p.nama.replace(/'/g, "\\'")}', ${p.harga}, '${p.thumbnail || ''}')"><i class="ri-shopping-cart-line"></i> +Keranjang</button>
+              </div>
+            </div>
+          </div>
+        `).join('');
+      } else {
+        container.innerHTML = '<p style="grid-column: 1/-1; text-align: center;">Gagal memuat produk promo.</p>';
+      }
+    });
+  </script>
+</body>
+</html>

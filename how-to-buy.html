@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cara Pembelian - Januar Web</title>
+  <link rel="stylesheet" href="assets/css/style.css">
+  <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+</head>
+<body>
+  <!-- Navbar -->
+  <header class="glass">
+    <div class="container navbar">
+      <a href="index.html" class="logo">
+        <i class="ri-store-2-line"></i> Januar Web
+      </a>
+      <nav class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="products.html">Produk</a>
+        <a href="promo.html" style="color: var(--danger); font-weight: bold;"><i class="ri-flashlight-fill"></i> Flash Sale</a>
+        <a href="how-to-buy.html" style="color: var(--primary);">Cara Beli</a>
+        <a href="track.html">Lacak</a>
+      </nav>
+      <div class="nav-actions">
+        <div class="cart-icon-wrapper" onclick="toggleCart()">
+          <i class="ri-shopping-cart-2-line"></i>
+          <span class="cart-badge" id="cart-badge">0</span>
+        </div>
+        <button id="theme-toggle" class="theme-toggle"><i class="ri-moon-line"></i></button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container" style="padding: 6rem 1.5rem 4rem; min-height: 80vh;">
+    <div style="text-align: center; margin-bottom: 3rem;">
+      <h1 class="section-title" style="margin-bottom: 0.5rem;">Cara Berbelanja</h1>
+      <p style="color: var(--text-muted);">Panduan super mudah untuk mendapatkan produk digital idaman Anda.</p>
+    </div>
+
+    <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 2rem;">
+      <!-- Step 1 -->
+      <div style="background: var(--surface-color); padding: 2.5rem; border-radius: var(--radius); text-align: center; border: 1px solid var(--border-color); position: relative;">
+        <div style="position: absolute; top: -20px; left: 50%; transform: translateX(-50%); background: var(--primary); color: white; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1.25rem;">1</div>
+        <i class="ri-shopping-bag-3-line" style="font-size: 4rem; color: #3B82F6; margin-bottom: 1rem; display: inline-block;"></i>
+        <h3 style="margin-bottom: 1rem;">Pilih Produk</h3>
+        <p style="color: var(--text-muted); line-height: 1.6;">Cari template, source code, atau produk digital lainnya. Klik tombol <b>"+Keranjang"</b> untuk memasukkannya ke daftar belanjaan Anda.</p>
+      </div>
+
+      <!-- Step 2 -->
+      <div style="background: var(--surface-color); padding: 2.5rem; border-radius: var(--radius); text-align: center; border: 1px solid var(--border-color); position: relative;">
+        <div style="position: absolute; top: -20px; left: 50%; transform: translateX(-50%); background: var(--primary); color: white; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1.25rem;">2</div>
+        <i class="ri-secure-payment-line" style="font-size: 4rem; color: #10B981; margin-bottom: 1rem; display: inline-block;"></i>
+        <h3 style="margin-bottom: 1rem;">Isi Data & Bayar</h3>
+        <p style="color: var(--text-muted); line-height: 1.6;">Buka Keranjang dan klik Checkout. Isi Nama, Email aktif (untuk pengiriman), dan nomor WA. Lakukan pembayaran menggunakan QRIS, GoPay, atau Transfer Bank secara instan.</p>
+      </div>
+
+      <!-- Step 3 -->
+      <div style="background: var(--surface-color); padding: 2.5rem; border-radius: var(--radius); text-align: center; border: 1px solid var(--border-color); position: relative;">
+        <div style="position: absolute; top: -20px; left: 50%; transform: translateX(-50%); background: var(--primary); color: white; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1.25rem;">3</div>
+        <i class="ri-mail-download-line" style="font-size: 4rem; color: #F59E0B; margin-bottom: 1rem; display: inline-block;"></i>
+        <h3 style="margin-bottom: 1rem;">Cek Email & Download</h3>
+        <p style="color: var(--text-muted); line-height: 1.6;">Setelah pembayaran otomatis terverifikasi (Lunas), link download file akan otomatis dikirimkan ke Email Anda saat itu juga! Anda juga bisa klik tombol download di halaman sukses.</p>
+      </div>
+    </div>
+
+    <div style="text-align: center; margin-top: 4rem;">
+      <a href="products.html" class="btn btn-primary" style="font-size: 1.1rem; padding: 1rem 2rem;"><i class="ri-shopping-cart-line"></i> Mulai Belanja Sekarang</a>
+    </div>
+  </main>
+
+  <footer>
+    <div class="container footer-content">
+      <div>
+        <a href="index.html" class="logo" style="margin-bottom: 1rem;">
+          <i class="ri-store-2-line"></i> Januar Web
+        </a>
+        <p style="color: var(--text-muted); max-width: 300px;">Solusi terbaik untuk aset digital berkualitas tinggi yang mempercepat alur kerja Anda.</p>
+      </div>
+      <div>
+        <h3 style="margin-bottom: 1rem; font-size: 1.1rem;">Hubungi Kami</h3>
+        <div style="color: var(--text-muted); display: flex; flex-direction: column; gap: 0.5rem;">
+          <a href="https://wa.me/6285641612901"><i class="ri-whatsapp-line"></i> +62 856-4161-2901</a>
+          <a href="mailto:support@januarweb.com"><i class="ri-mail-line"></i> support@januarweb.com</a>
+          <p style="margin-top: 0.5rem; line-height: 1.5;"><i class="ri-map-pin-line"></i> Jl. Raya Kemiriamba<br>Jatibarang, Brebes<br>Jawa Tengah</p>
+        </div>
+      </div>
+      <div>
+        <h3 style="margin-bottom: 1rem; font-size: 1.1rem;">Pembayaran Aman</h3>
+        <div class="trust-badges">
+          <div class="trust-badge"><i class="ri-bank-card-line" style="color: #005E6A;"></i> BCA</div>
+          <div class="trust-badge"><i class="ri-bank-fill" style="color: #003D79;"></i> Mandiri</div>
+          <div class="trust-badge"><i class="ri-qr-code-line" style="color: #ED1C24;"></i> QRIS</div>
+          <div class="trust-badge"><i class="ri-wallet-3-line" style="color: #00AED6;"></i> GoPay</div>
+          <div class="trust-badge"><i class="ri-wallet-3-fill" style="color: #4C3494;"></i> OVO</div>
+        </div>
+      </div>
+    </div>
+    <div class="container" style="text-align: center; margin-top: 3rem; color: var(--text-muted); font-size: 0.875rem;">
+      &copy; 2026 Januar Web Brebes. | <a href="admin/login.html" style="color: inherit; text-decoration: none;"><i class="ri-shield-keyhole-line"></i> Login Admin</a>
+    </div>
+  </footer>
+
+  <!-- Shopping Cart Sidebar -->
+  <div class="cart-overlay" id="cart-overlay" onclick="toggleCart()"></div>
+  <div class="cart-sidebar" id="cart-sidebar">
+    <div class="cart-header">
+      <h3>Keranjang Belanja</h3>
+      <button class="cart-close" onclick="toggleCart()"><i class="ri-close-line"></i></button>
+    </div>
+    <div class="cart-items" id="cart-items"></div>
+    <div class="cart-footer">
+      <div class="cart-total">
+        <span>Total:</span>
+        <span id="cart-total-price">Rp 0</span>
+      </div>
+      <button class="btn btn-primary" style="width: 100%;" onclick="checkoutCart()">Checkout Sekarang</button>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <script src="assets/js/api.js"></script>
+  <script src="assets/js/main.js"></script>
+</body>
+</html>

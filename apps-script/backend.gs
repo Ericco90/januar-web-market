@@ -33,6 +33,8 @@ function doPost(e) {
 
     if (action === 'createOrder') {
       return jsonResponse(createOrder(data.payload));
+    } else if (action === 'trackOrder') {
+      return jsonResponse(trackOrder(data.payload));
     } else if (action === 'adminLogin') {
       return jsonResponse(adminLogin(data.payload));
     } else if (action === 'adminAddProduct') {
@@ -129,6 +131,59 @@ function createOrder(payload) {
       redirectUrl: midtransResult.redirect_url
     }
   };
+}
+
+function trackOrder(payload) {
+  const emailToTrack = payload.email;
+  if (!emailToTrack) return {status: 'error', message: 'Email tidak boleh kosong'};
+  
+  const orderSheet = SpreadsheetApp.openById(SPREADSHEET_ID).getSheetByName('Order');
+  const orderData = orderSheet.getDataRange().getValues();
+  
+  const productSheet = SpreadsheetApp.openById(SPREADSHEET_ID).getSheetByName('Produk');
+  const products = productSheet.getDataRange().getValues();
+  
+  let foundCount = 0;
+  let fileLinksHTML = '<ul style="padding-left: 20px;">';
+  let customerName = 'Pelanggan';
+
+  // Find all Lunas orders for this email
+  for (let i = 1; i < orderData.length; i++) {
+    if (orderData[i][3] === emailToTrack && orderData[i][7] === 'Lunas') {
+      customerName = orderData[i][2]; // nama
+      const productName = orderData[i][5];
+      const orderedNames = productName.split(', ').map(n => n.trim());
+      
+      for (let name of orderedNames) {
+        for (let j = 1; j < products.length; j++) {
+          if (products[j][1] === name) {
+            fileLinksHTML += `<li style="margin-bottom:10px;"><b>${name}</b><br><a href="${products[j][6]}" style="color:#4ECDC4;text-decoration:none;">Download File</a></li>`;
+            foundCount++;
+            break;
+          }
+        }
+      }
+    }
+  }
+  fileLinksHTML += '</ul>';
+  
+  if (foundCount > 0) {
+    const subject = "Pemulihan Pesanan: File Anda dari Januar Web Brebes";
+    const body = `Halo ${customerName},<br><br>
+    Sesuai permintaan Anda, berikut adalah daftar tautan (link) unduhan untuk produk digital yang pernah Anda beli:<br><br>
+    ${fileLinksHTML}<br>
+    Salam,<br><b>Januar Web Brebes</b>`;
+    
+    MailApp.sendEmail({
+      to: emailToTrack,
+      subject: subject,
+      htmlBody: body
+    });
+    
+    return {status: 'success', message: 'Link download berhasil dikirim ulang ke email Anda!'};
+  } else {
+    return {status: 'error', message: 'Tidak ditemukan pesanan Lunas untuk email tersebut.'};
+  }
 }
 
 function createMidtransTransaction(orderId, price, productName, name, email, phone) {

@@ -89,6 +89,7 @@ const API = {
   },
   getSettings: () => fetchGet('getSettings'),
   createOrder: (data) => fetchPost('createOrder', data),
+  trackOrder: (email) => fetchPost('trackOrder', {email}),
   
   // Admin API
   adminLogin: (username, password) => fetchPost('adminLogin', {username, password}),

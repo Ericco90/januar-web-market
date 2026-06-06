@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lacak Pesanan - Januar Web</title>
+  <link rel="stylesheet" href="assets/css/style.css">
+  <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+</head>
+<body>
+  <header class="glass">
+    <div class="container navbar">
+      <a href="index.html" class="logo">
+        <i class="ri-store-2-line"></i> Januar Web
+      </a>
+      <nav class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="products.html">Produk</a>
+        <a href="promo.html" style="color: var(--danger); font-weight: bold;"><i class="ri-flashlight-fill"></i> Flash Sale</a>
+        <a href="how-to-buy.html">Cara Beli</a>
+        <a href="track.html" style="color: var(--primary);">Lacak</a>
+      </nav>
+      <div class="nav-actions">
+        <div class="cart-icon-wrapper" onclick="toggleCart()">
+          <i class="ri-shopping-cart-2-line"></i>
+          <span class="cart-badge" id="cart-badge">0</span>
+        </div>
+        <button id="theme-toggle" class="theme-toggle"><i class="ri-moon-line"></i></button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container" style="padding: 6rem 1.5rem 4rem; min-height: 80vh; display: flex; align-items: center; justify-content: center;">
+    <div style="background: var(--surface-color); padding: 3rem 2rem; border-radius: var(--radius); border: 1px solid var(--border-color); box-shadow: var(--card-shadow); max-width: 500px; width: 100%; text-align: center;">
+      <i class="ri-mail-send-line" style="font-size: 4rem; color: var(--primary); margin-bottom: 1rem; display: inline-block;"></i>
+      <h1 style="margin-bottom: 0.5rem;">Lupa Simpan File?</h1>
+      <p style="color: var(--text-muted); margin-bottom: 2rem; line-height: 1.5;">Masukkan alamat Email yang Anda gunakan saat membeli produk. Sistem kami akan mengirimkan ulang link download ke email Anda jika terdaftar.</p>
+      
+      <form id="track-form" onsubmit="event.preventDefault(); submitTrack();">
+        <div style="margin-bottom: 1.5rem; text-align: left;">
+          <label style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Alamat Email Anda</label>
+          <input type="email" id="track-email" required placeholder="nama@email.com" style="width: 100%; padding: 0.75rem; border: 1px solid var(--border-color); border-radius: 4px; background: var(--bg-color); color: var(--text-color);">
+        </div>
+        <button type="submit" id="track-btn" class="btn btn-primary" style="width: 100%; padding: 0.75rem;"><i class="ri-search-line"></i> Cari & Kirim Ulang</button>
+      </form>
+      
+      <div id="track-result" style="margin-top: 1.5rem; display: none; padding: 1rem; border-radius: 4px;"></div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container footer-content">
+      <div>
+        <a href="index.html" class="logo" style="margin-bottom: 1rem;">
+          <i class="ri-store-2-line"></i> Januar Web
+        </a>
+        <p style="color: var(--text-muted); max-width: 300px;">Solusi terbaik untuk aset digital berkualitas tinggi yang mempercepat alur kerja Anda.</p>
+      </div>
+      <div>
+        <h3 style="margin-bottom: 1rem; font-size: 1.1rem;">Hubungi Kami</h3>
+        <div style="color: var(--text-muted); display: flex; flex-direction: column; gap: 0.5rem;">
+          <a href="https://wa.me/6285641612901"><i class="ri-whatsapp-line"></i> +62 856-4161-2901</a>
+          <a href="mailto:support@januarweb.com"><i class="ri-mail-line"></i> support@januarweb.com</a>
+        </div>
+      </div>
+      <div>
+        <h3 style="margin-bottom: 1rem; font-size: 1.1rem;">Pembayaran Aman</h3>
+        <div class="trust-badges">
+          <div class="trust-badge"><i class="ri-bank-card-line" style="color: #005E6A;"></i> BCA</div>
+          <div class="trust-badge"><i class="ri-bank-fill" style="color: #003D79;"></i> Mandiri</div>
+          <div class="trust-badge"><i class="ri-qr-code-line" style="color: #ED1C24;"></i> QRIS</div>
+          <div class="trust-badge"><i class="ri-wallet-3-line" style="color: #00AED6;"></i> GoPay</div>
+          <div class="trust-badge"><i class="ri-wallet-3-fill" style="color: #4C3494;"></i> OVO</div>
+        </div>
+      </div>
+    </div>
+    <div class="container" style="text-align: center; margin-top: 3rem; color: var(--text-muted); font-size: 0.875rem;">
+      &copy; 2026 Januar Web Brebes. | <a href="admin/login.html" style="color: inherit; text-decoration: none;"><i class="ri-shield-keyhole-line"></i> Login Admin</a>
+    </div>
+  </footer>
+
+  <!-- Shopping Cart Sidebar -->
+  <div class="cart-overlay" id="cart-overlay" onclick="toggleCart()"></div>
+  <div class="cart-sidebar" id="cart-sidebar">
+    <div class="cart-header">
+      <h3>Keranjang Belanja</h3>
+      <button class="cart-close" onclick="toggleCart()"><i class="ri-close-line"></i></button>
+    </div>
+    <div class="cart-items" id="cart-items"></div>
+    <div class="cart-footer">
+      <div class="cart-total">
+        <span>Total:</span>
+        <span id="cart-total-price">Rp 0</span>
+      </div>
+      <button class="btn btn-primary" style="width: 100%;" onclick="checkoutCart()">Checkout Sekarang</button>
+    </div>
+  </div>
+
+  <div class="toast-container" id="toast-container"></div>
+
+  <script src="assets/js/api.js"></script>
+  <script src="assets/js/main.js"></script>
+  <script>
+    async function submitTrack() {
+      const email = document.getElementById('track-email').value;
+      const btn = document.getElementById('track-btn');
+      const resDiv = document.getElementById('track-result');
+      
+      if(!email) return;
+      
+      btn.disabled = true;
+      btn.innerHTML = '<i class="ri-loader-4-line ri-spin"></i> Sedang Mencari...';
+      resDiv.style.display = 'none';
+      
+      const res = await API.trackOrder(email);
+      
+      btn.disabled = false;
+      btn.innerHTML = '<i class="ri-search-line"></i> Cari & Kirim Ulang';
+      
+      resDiv.style.display = 'block';
+      if(res.status === 'success') {
+        resDiv.style.backgroundColor = 'rgba(16, 185, 129, 0.1)';
+        resDiv.style.color = '#10B981';
+        resDiv.style.border = '1px solid #10B981';
+        resDiv.innerHTML = `<i class="ri-checkbox-circle-line"></i> ${res.message}`;
+      } else {
+        resDiv.style.backgroundColor = 'rgba(239, 68, 68, 0.1)';
+        resDiv.style.color = 'var(--danger)';
+        resDiv.style.border = '1px solid var(--danger)';
+        resDiv.innerHTML = `<i class="ri-error-warning-line"></i> ${res.message}`;
+      }
+    }
+  </script>
+</body>
+</html>
