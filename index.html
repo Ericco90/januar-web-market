@@ -257,14 +257,11 @@
 
       tContainer.innerHTML = allTestimonials.map(t => `
         <div style="background: var(--surface-color); padding: 2rem; border-radius: var(--radius); border: 1px solid var(--border-color); box-shadow: var(--card-shadow);">
-          <div style="display: flex; gap: 1rem; align-items: center; margin-bottom: 1rem;">
-            <img src="${t.foto || 'https://via.placeholder.com/50'}" alt="${t.nama}" style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover;" loading="lazy">
-            <div>
-              <h4 style="margin: 0;">${t.nama}</h4>
-              <div style="color: #F59E0B; font-size: 0.875rem;"><i class="ri-star-fill"></i><i class="ri-star-fill"></i><i class="ri-star-fill"></i><i class="ri-star-fill"></i><i class="ri-star-fill"></i></div>
-            </div>
+          <div style="margin-bottom: 1rem;">
+            <h4 style="margin: 0; font-size: 1.1rem;">${t.nama}</h4>
+            <div style="color: #F59E0B; font-size: 0.875rem; margin-top: 0.25rem;"><i class="ri-star-fill"></i><i class="ri-star-fill"></i><i class="ri-star-fill"></i><i class="ri-star-fill"></i><i class="ri-star-fill"></i></div>
           </div>
-          <p style="color: var(--text-muted); font-size: 0.95rem;">"${t.isi}"</p>
+          <p style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.6;">"${t.isi}"</p>
         </div>
       `).join('');
     }
