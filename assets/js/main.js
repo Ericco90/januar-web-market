@@ -69,23 +69,89 @@ function loadCommonElements() {
   // If navbar is empty, we could populate it here to keep HTML DRY
 }
 
-// Wishlist Management
-function toggleWishlist(productId) {
-  let wishlist = JSON.parse(localStorage.getItem('wishlist') || '[]');
-  const index = wishlist.indexOf(productId);
-  
-  if (index === -1) {
-    wishlist.push(productId);
-    alert('Added to wishlist');
-  } else {
-    wishlist.splice(index, 1);
-    alert('Removed from wishlist');
-  }
-  
-  localStorage.setItem('wishlist', JSON.stringify(wishlist));
-  updateWishlistUI();
+// Toast Notifications
+function showToast(message, type = 'success') {
+  const container = document.getElementById('toast-container');
+  if (!container) return;
+  const toast = document.createElement('div');
+  toast.className = 'toast';
+  toast.innerHTML = `<i class="ri-${type === 'success' ? 'checkbox-circle' : 'error-warning'}-line" style="color: var(--${type === 'success' ? 'primary' : 'danger'}); font-size: 1.25rem;"></i> <span>${message}</span>`;
+  container.appendChild(toast);
+  setTimeout(() => toast.remove(), 3000);
 }
 
-function updateWishlistUI() {
-  // Update icons if product is in wishlist
+// Shopping Cart Management
+let cart = JSON.parse(localStorage.getItem('januar_cart') || '[]');
+
+function updateCartUI() {
+  const badge = document.getElementById('cart-badge');
+  if (badge) badge.innerText = cart.length;
+
+  const cartItemsContainer = document.getElementById('cart-items');
+  const cartTotalPrice = document.getElementById('cart-total-price');
+  
+  if (!cartItemsContainer || !cartTotalPrice) return;
+
+  if (cart.length === 0) {
+    cartItemsContainer.innerHTML = '<div style="text-align:center; color: var(--text-muted); margin-top: 2rem;">Keranjang Anda kosong</div>';
+    cartTotalPrice.innerText = 'Rp 0';
+    return;
+  }
+
+  let total = 0;
+  cartItemsContainer.innerHTML = cart.map(item => {
+    total += parseInt(item.price);
+    return `
+      <div class="cart-item">
+        <img src="${item.thumbnail || 'https://via.placeholder.com/70'}" alt="${item.name}">
+        <div class="cart-item-info">
+          <div class="cart-item-title">${item.name}</div>
+          <div class="cart-item-price">${formatRupiah(item.price)}</div>
+          <span class="cart-item-remove" onclick="removeFromCart('${item.id}')"><i class="ri-delete-bin-line"></i> Hapus</span>
+        </div>
+      </div>
+    `;
+  }).join('');
+  
+  cartTotalPrice.innerText = formatRupiah(total);
 }
+
+function toggleCart() {
+  const sidebar = document.getElementById('cart-sidebar');
+  const overlay = document.getElementById('cart-overlay');
+  if(sidebar) sidebar.classList.toggle('active');
+  if(overlay) overlay.classList.toggle('active');
+  updateCartUI();
+}
+
+function addToCart(id, name, price, thumbnail) {
+  if (cart.find(item => item.id === id)) {
+    showToast('Produk sudah ada di keranjang', 'warning');
+    return;
+  }
+  cart.push({ id, name, price, thumbnail });
+  localStorage.setItem('januar_cart', JSON.stringify(cart));
+  updateCartUI();
+  showToast('Berhasil ditambahkan ke keranjang');
+}
+
+function removeFromCart(id) {
+  cart = cart.filter(item => item.id !== id);
+  localStorage.setItem('januar_cart', JSON.stringify(cart));
+  updateCartUI();
+}
+
+function checkoutCart() {
+  if (cart.length === 0) {
+    showToast('Keranjang masih kosong', 'warning');
+    return;
+  }
+  window.location.href = 'checkout.html?cart=1';
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  initTheme();
+  initMobileMenu();
+  loadCommonElements();
+  updateCartUI(); // Initialize cart UI
+});

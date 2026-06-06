@@ -48,52 +48,95 @@
   <script src="assets/js/main.js"></script>
   <script>
     let currentProduct = null;
+    let isCartMode = false;
+    let cartItems = [];
+    let totalPrice = 0;
 
     document.addEventListener('DOMContentLoaded', async () => {
       const productId = getQueryParam('id');
-      if(!productId) {
-        window.location.href = 'products.html';
-        return;
-      }
+      const isCart = getQueryParam('cart');
 
-      const res = await API.getProducts();
-      if(res.status === 'success' && res.data) {
-        currentProduct = res.data.find(p => p.id === productId);
-        if(currentProduct) {
-          document.getElementById('order-summary').innerHTML = `
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-              <div>
-                <h3 style="font-size: 1.1rem; margin-bottom: 0.25rem;">${currentProduct.nama}</h3>
-                <span class="product-category">${currentProduct.kategori}</span>
-              </div>
-              <div style="font-size: 1.25rem; font-weight: bold; color: var(--primary);">
-                ${formatRupiah(currentProduct.harga)}
-              </div>
-            </div>
-          `;
-        } else {
+      if (isCart === '1') {
+        isCartMode = true;
+        cartItems = JSON.parse(localStorage.getItem('januar_cart') || '[]');
+        if (cartItems.length === 0) {
           window.location.href = 'products.html';
+          return;
         }
+
+        totalPrice = cartItems.reduce((sum, item) => sum + parseInt(item.price), 0);
+        
+        let itemsHTML = cartItems.map(item => `
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+            <div>
+              <div style="font-size: 0.95rem;">${item.name}</div>
+            </div>
+            <div style="font-weight: bold; color: var(--text-main);">
+              ${formatRupiah(item.price)}
+            </div>
+          </div>
+        `).join('');
+
+        document.getElementById('order-summary').innerHTML = `
+          <h3 style="margin-bottom: 1rem; border-bottom: 1px dashed var(--border-color); padding-bottom: 0.5rem;">Ringkasan Pesanan (Keranjang)</h3>
+          ${itemsHTML}
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border-color);">
+            <div style="font-weight: bold;">Total Bayar</div>
+            <div style="font-size: 1.25rem; font-weight: bold; color: var(--primary);">
+              ${formatRupiah(totalPrice)}
+            </div>
+          </div>
+        `;
+      } else if (productId) {
+        const res = await API.getProducts();
+        if(res.status === 'success' && res.data) {
+          currentProduct = res.data.find(p => p.id === productId);
+          if(currentProduct) {
+            totalPrice = currentProduct.harga;
+            document.getElementById('order-summary').innerHTML = `
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                  <h3 style="font-size: 1.1rem; margin-bottom: 0.25rem;">${currentProduct.nama}</h3>
+                  <span class="product-category">${currentProduct.kategori}</span>
+                </div>
+                <div style="font-size: 1.25rem; font-weight: bold; color: var(--primary);">
+                  ${formatRupiah(currentProduct.harga)}
+                </div>
+              </div>
+            `;
+          } else {
+            window.location.href = 'products.html';
+          }
+        }
+      } else {
+        window.location.href = 'products.html';
       }
     });
 
     document.getElementById('checkoutForm').addEventListener('submit', async (e) => {
       e.preventDefault();
-      if(!currentProduct) return;
+      if(!currentProduct && !isCartMode) return;
 
       const btn = document.getElementById('btn-pay');
       const originalText = btn.innerHTML;
-      btn.innerHTML = '<div class="loader" style="width:20px;height:20px;border-width:2px;"></div> Memproses...';
+      btn.innerHTML = '<div class="loader" style="width:20px;height:20px;border-width:2px;display:inline-block;vertical-align:middle;"></div> Memproses...';
       btn.disabled = true;
 
       const payload = {
-        productId: currentProduct.id,
-        productName: currentProduct.nama,
-        price: currentProduct.harga,
         name: document.getElementById('name').value,
         email: document.getElementById('email').value,
-        wa: document.getElementById('wa').value
+        wa: document.getElementById('wa').value,
+        price: totalPrice
       };
+
+      if (isCartMode) {
+        payload.cartItems = cartItems;
+        payload.productName = "Pesanan Bundle (" + cartItems.length + " Produk)";
+        payload.productId = "CART";
+      } else {
+        payload.productId = currentProduct.id;
+        payload.productName = currentProduct.nama;
+      }
 
       const res = await API.createOrder(payload);
       
@@ -102,7 +145,12 @@
         if(snapToken) {
           snap.pay(snapToken, {
             onSuccess: function(result){
-              window.location.href = `success.html?order_id=${res.data.orderId}&file=${encodeURIComponent(currentProduct.file)}`;
+              if(isCartMode) {
+                localStorage.removeItem('januar_cart'); // Empty cart on success
+                window.location.href = `success.html?order_id=${res.data.orderId}&cart=1`;
+              } else {
+                window.location.href = `success.html?order_id=${res.data.orderId}&file=${encodeURIComponent(currentProduct.file)}`;
+              }
             },
             onPending: function(result){
               alert("Menunggu pembayaran!");

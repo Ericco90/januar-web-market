@@ -11,18 +11,25 @@
 <body>
 
   <!-- Navbar -->
-  <header>
+  <header class="glass">
     <div class="container navbar">
       <a href="index.html" class="logo">
-        <i class="ri-store-2-line"></i> Januar Web Brebes
+        <i class="ri-store-2-line"></i> Januar Web
       </a>
+      <div class="nav-search" style="flex-grow: 1; max-width: 400px; display: none;">
+        <i class="ri-search-line"></i>
+        <input type="text" placeholder="Cari produk..." style="width: 100%;">
+      </div>
       <nav class="nav-links">
         <a href="index.html">Home</a>
         <a href="products.html">Produk</a>
         <a href="#kategori">Kategori</a>
-        <a href="#faq">FAQ</a>
       </nav>
       <div class="nav-actions">
+        <div class="cart-icon-wrapper" onclick="toggleCart()">
+          <i class="ri-shopping-cart-2-line"></i>
+          <span class="cart-badge" id="cart-badge">0</span>
+        </div>
         <button id="theme-toggle" class="theme-toggle" aria-label="Toggle Dark Mode">
           <i class="ri-moon-line"></i>
         </button>
@@ -30,17 +37,52 @@
     </div>
   </header>
 
-  <!-- Hero Section -->
-  <section class="hero">
-    <div class="container">
-      <h1>Bikin Project Lebih Cepat dengan Aset Digital Kece!</h1>
-      <p>Ribuan template, source code, dan prompt AI hits yang siap ngebantu tugas & kerjaanmu.</p>
-      <div class="hero-btns">
-        <a href="products.html" class="btn btn-primary"><i class="ri-shopping-cart-line"></i> Beli Sekarang</a>
-        <a href="#kategori" class="btn btn-outline">Lihat Kategori</a>
+  <!-- Hero Section (Carousel) -->
+  <section class="hero" style="padding: 0; position: relative; overflow: hidden;">
+    <div id="hero-carousel" style="display: flex; transition: transform 0.5s ease;">
+      <!-- Slide 1 -->
+      <div style="min-width: 100%; padding: 6rem 1.5rem; background: linear-gradient(135deg, rgba(79,70,229,0.1) 0%, rgba(249,250,251,0) 100%);">
+        <div class="container">
+          <h1>Bikin Project Lebih Cepat dengan Aset Digital Kece!</h1>
+          <p>Ribuan template, source code, dan prompt AI hits yang siap ngebantu tugas & kerjaanmu.</p>
+          <div class="hero-btns">
+            <a href="products.html" class="btn btn-primary"><i class="ri-shopping-cart-line"></i> Beli Sekarang</a>
+            <a href="#kategori" class="btn btn-outline">Lihat Kategori</a>
+          </div>
+        </div>
+      </div>
+      <!-- Slide 2 -->
+      <div style="min-width: 100%; padding: 6rem 1.5rem; background: linear-gradient(135deg, rgba(255,107,107,0.1) 0%, rgba(249,250,251,0) 100%);">
+        <div class="container">
+          <h1>Diskon Spesial Minggu Ini!</h1>
+          <p>Dapatkan diskon hingga 50% untuk produk Source Code pilihan. Jangan sampai kehabisan!</p>
+          <div class="hero-btns">
+            <a href="products.html?cat=Source Code" class="btn btn-primary"><i class="ri-percent-line"></i> Klaim Diskon</a>
+          </div>
+        </div>
       </div>
     </div>
+    <!-- Carousel Dots -->
+    <div style="position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); display: flex; gap: 8px;">
+      <span class="carousel-dot active" style="width: 12px; height: 12px; border-radius: 50%; background: var(--primary); cursor: pointer;" onclick="goToSlide(0)"></span>
+      <span class="carousel-dot" style="width: 12px; height: 12px; border-radius: 50%; background: var(--border-color); cursor: pointer;" onclick="goToSlide(1)"></span>
+    </div>
   </section>
+
+  <script>
+    let currentSlide = 0;
+    function goToSlide(index) {
+      currentSlide = index;
+      document.getElementById('hero-carousel').style.transform = `translateX(-${index * 100}%)`;
+      const dots = document.querySelectorAll('.carousel-dot');
+      dots.forEach((dot, i) => {
+        dot.style.background = i === index ? 'var(--primary)' : 'var(--border-color)';
+      });
+    }
+    setInterval(() => {
+      goToSlide(currentSlide === 0 ? 1 : 0);
+    }, 5000);
+  </script>
 
   <!-- Produk Unggulan -->
   <section class="container" style="padding: 4rem 1.5rem;">
@@ -125,11 +167,11 @@
         </div>
       </div>
       <div>
-        <h3 style="margin-bottom: 1rem; font-size: 1.1rem;">Sosial Media</h3>
-        <div class="social-links">
-          <a href="#" style="font-size: 1.5rem; color: var(--text-muted);"><i class="ri-instagram-line"></i></a>
-          <a href="#" style="font-size: 1.5rem; color: var(--text-muted);"><i class="ri-twitter-x-line"></i></a>
-          <a href="#" style="font-size: 1.5rem; color: var(--text-muted);"><i class="ri-github-line"></i></a>
+        <h3 style="margin-bottom: 1rem; font-size: 1.1rem;">Pembayaran Aman</h3>
+        <div class="trust-badges">
+          <div class="trust-badge"><i class="ri-bank-card-line" style="color: var(--primary);"></i> BCA / Mandiri</div>
+          <div class="trust-badge"><i class="ri-qr-code-line" style="color: var(--primary);"></i> QRIS</div>
+          <div class="trust-badge"><i class="ri-wallet-3-line" style="color: var(--primary);"></i> GoPay / OVO</div>
         </div>
       </div>
     </div>
@@ -137,6 +179,28 @@
       &copy; 2026 Januar Web Brebes. All rights reserved.
     </div>
   </footer>
+
+  <!-- Shopping Cart Sidebar -->
+  <div class="cart-overlay" id="cart-overlay" onclick="toggleCart()"></div>
+  <div class="cart-sidebar" id="cart-sidebar">
+    <div class="cart-header">
+      <h3>Keranjang Belanja</h3>
+      <button class="cart-close" onclick="toggleCart()"><i class="ri-close-line"></i></button>
+    </div>
+    <div class="cart-items" id="cart-items">
+      <!-- Items will be injected here via JS -->
+    </div>
+    <div class="cart-footer">
+      <div class="cart-total">
+        <span>Total:</span>
+        <span id="cart-total-price">Rp 0</span>
+      </div>
+      <button class="btn btn-primary" style="width: 100%;" onclick="checkoutCart()">Checkout Sekarang</button>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toast-container"></div>
 
   <script src="assets/js/api.js"></script>
   <script src="assets/js/main.js"></script>
@@ -151,7 +215,10 @@
             <span class="product-category">${p.kategori}</span>
             <h3 class="product-title">${p.nama}</h3>
             <div class="product-price">${formatRupiah(p.harga)}</div>
-            <a href="product-detail.html?id=${p.id}" class="btn btn-outline" style="width: 100%;">Detail Produk</a>
+            <div style="display: flex; gap: 0.5rem;">
+              <a href="product-detail.html?id=${p.id}" class="btn btn-outline" style="flex: 1; padding: 0.5rem;"><i class="ri-eye-line"></i> Detail</a>
+              <button class="btn btn-primary" style="flex: 1; padding: 0.5rem;" onclick="addToCart('${p.id}', '${p.nama.replace(/'/g, "\\'")}', ${p.harga}, '${p.thumbnail || ''}')"><i class="ri-shopping-cart-line"></i> +Keranjang</button>
+            </div>
           </div>
         </div>
       `).join('');

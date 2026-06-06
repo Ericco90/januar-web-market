@@ -38,17 +38,21 @@
     document.addEventListener('DOMContentLoaded', () => {
       const orderId = getQueryParam('order_id');
       const fileUrl = getQueryParam('file');
+      const isCart = getQueryParam('cart');
       
       if(orderId) document.getElementById('orderIdDisplay').textContent = orderId;
       
       const dlLink = document.getElementById('downloadLink');
-      if(fileUrl && fileUrl !== 'undefined') {
+      if (isCart === '1') {
+        dlLink.style.display = 'none';
+        const msg = document.createElement('div');
+        msg.innerHTML = '<p style="color:var(--primary); font-weight:bold; margin-bottom:1rem;">Link download semua produk telah dikirim ke Email Anda!</p>';
+        dlLink.parentNode.insertBefore(msg, dlLink);
+      } else if(fileUrl && fileUrl !== 'undefined') {
         dlLink.href = decodeURIComponent(fileUrl);
       } else {
         dlLink.style.display = 'none';
       }
-
-      // Hapus data wishlist atau cart jika diperlukan
     });
   </script>
 </body>

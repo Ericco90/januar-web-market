@@ -9,16 +9,24 @@
 </head>
 <body>
   <!-- Header Minimal -->
-  <header>
+  <header class="glass">
     <div class="container navbar">
       <a href="index.html" class="logo">
-        <i class="ri-store-2-line"></i> Januar Web Brebes
+        <i class="ri-store-2-line"></i> Januar Web
       </a>
+      <div class="nav-search" style="flex-grow: 1; max-width: 400px; display: none;">
+        <i class="ri-search-line"></i>
+        <input type="text" placeholder="Cari produk..." style="width: 100%;">
+      </div>
       <nav class="nav-links">
         <a href="index.html">Home</a>
         <a href="products.html" style="color: var(--primary);">Produk</a>
       </nav>
       <div class="nav-actions">
+        <div class="cart-icon-wrapper" onclick="toggleCart()">
+          <i class="ri-shopping-cart-2-line"></i>
+          <span class="cart-badge" id="cart-badge">0</span>
+        </div>
         <button id="theme-toggle" class="theme-toggle"><i class="ri-moon-line"></i></button>
       </div>
     </div>
@@ -61,11 +69,40 @@
     </div>
   </main>
 
-  <footer style="margin-top: 0;">
+  <footer style="margin-top: 0; padding-top: 2rem;">
+    <div class="container" style="display: flex; justify-content: center; margin-bottom: 1.5rem;">
+      <div class="trust-badges" style="margin-top: 0;">
+        <div class="trust-badge"><i class="ri-bank-card-line" style="color: var(--primary);"></i> BCA / Mandiri</div>
+        <div class="trust-badge"><i class="ri-qr-code-line" style="color: var(--primary);"></i> QRIS</div>
+        <div class="trust-badge"><i class="ri-wallet-3-line" style="color: var(--primary);"></i> GoPay / OVO</div>
+      </div>
+    </div>
     <div class="container" style="text-align: center; color: var(--text-muted); font-size: 0.875rem;">
       &copy; 2026 Januar Web Brebes.
     </div>
   </footer>
+
+  <!-- Shopping Cart Sidebar -->
+  <div class="cart-overlay" id="cart-overlay" onclick="toggleCart()"></div>
+  <div class="cart-sidebar" id="cart-sidebar">
+    <div class="cart-header">
+      <h3>Keranjang Belanja</h3>
+      <button class="cart-close" onclick="toggleCart()"><i class="ri-close-line"></i></button>
+    </div>
+    <div class="cart-items" id="cart-items">
+      <!-- Items will be injected here via JS -->
+    </div>
+    <div class="cart-footer">
+      <div class="cart-total">
+        <span>Total:</span>
+        <span id="cart-total-price">Rp 0</span>
+      </div>
+      <button class="btn btn-primary" style="width: 100%;" onclick="checkoutCart()">Checkout Sekarang</button>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toast-container"></div>
 
   <script src="assets/js/api.js"></script>
   <script src="assets/js/main.js"></script>
@@ -120,7 +157,10 @@
             <span class="product-category">${p.kategori}</span>
             <h3 class="product-title">${p.nama}</h3>
             <div class="product-price">${formatRupiah(p.harga)}</div>
-            <a href="product-detail.html?id=${p.id}" class="btn btn-primary" style="width: 100%;">Detail Produk</a>
+            <div style="display: flex; gap: 0.5rem;">
+              <a href="product-detail.html?id=${p.id}" class="btn btn-outline" style="flex: 1; padding: 0.5rem;"><i class="ri-eye-line"></i> Detail</a>
+              <button class="btn btn-primary" style="flex: 1; padding: 0.5rem;" onclick="addToCart('${p.id}', '${p.nama.replace(/'/g, "\\'")}', ${p.harga}, '${p.thumbnail || ''}')"><i class="ri-shopping-cart-line"></i> +Keranjang</button>
+            </div>
           </div>
         </div>
       `).join('');

@@ -106,15 +106,20 @@ function getSetting(key) {
 }
 
 function createOrder(payload) {
-  // payload: { productId, name, email, wa, price, productName }
+  // payload: { productId, name, email, wa, price, productName, cartItems: [] }
   const sheet = SpreadsheetApp.openById(SPREADSHEET_ID).getSheetByName('Order');
   const orderId = 'ORD-' + new Date().getTime();
   const date = new Date().toISOString();
   
-  sheet.appendRow([orderId, date, payload.name, payload.email, payload.wa, payload.productName, payload.price, 'Menunggu Pembayaran']);
+  let finalProductName = payload.productName;
+  if (payload.cartItems && payload.cartItems.length > 0) {
+    finalProductName = payload.cartItems.map(item => item.name).join(', ');
+  }
+  
+  sheet.appendRow([orderId, date, payload.name, payload.email, payload.wa, finalProductName, payload.price, 'Menunggu Pembayaran']);
   
   // Create Midtrans Transaction
-  const midtransResult = createMidtransTransaction(orderId, payload.price, payload.productName, payload.name, payload.email, payload.wa);
+  const midtransResult = createMidtransTransaction(orderId, payload.price, finalProductName, payload.name, payload.email, payload.wa);
   
   return {
     status: 'success', 
@@ -210,22 +215,30 @@ function handleMidtransWebhook(data) {
           // Cari link file produk di tab Produk
           const productSheet = SpreadsheetApp.openById(SPREADSHEET_ID).getSheetByName('Produk');
           const products = productSheet.getDataRange().getValues();
-          let fileLink = '';
-          for (let j = 1; j < products.length; j++) {
-            if (products[j][1] === productName) {
-              fileLink = products[j][6]; // index 6 = file
-              break;
+          
+          const orderedNames = productName.split(', ').map(n => n.trim());
+          let fileLinksHTML = '<ul style="padding-left: 20px;">';
+          let foundCount = 0;
+
+          for (let name of orderedNames) {
+            for (let j = 1; j < products.length; j++) {
+              if (products[j][1] === name) {
+                fileLinksHTML += `<li style="margin-bottom:10px;"><b>${name}</b><br><a href="${products[j][6]}" style="color:#4ECDC4;text-decoration:none;">Download File</a></li>`;
+                foundCount++;
+                break;
+              }
             }
           }
+          fileLinksHTML += '</ul>';
           
           // Kirim Email Otomatis via Gmail API (MailApp)
-          if (email && fileLink) {
-            const subject = "Pesanan Berhasil: " + productName;
+          if (email && foundCount > 0) {
+            const subject = "Pesanan Berhasil: " + (orderedNames.length > 1 ? "Pesanan Bundle" : productName);
             const body = `Halo ${customerName},<br><br>
-            Terima kasih! Pembayaran Anda untuk pesanan <b>${productName}</b> telah kami terima (Lunas).<br><br>
-            Berikut adalah tautan untuk mengakses/mendownload produk digital Anda:<br>
-            <a href="${fileLink}" style="padding:10px 20px;background:#4ECDC4;color:#fff;text-decoration:none;border-radius:5px;display:inline-block;margin-top:10px;margin-bottom:10px;">Akses Produk Saya</a><br><br>
-            Jika tombol tidak berfungsi, salin tautan berikut ke browser Anda:<br>${fileLink}<br><br>
+            Terima kasih! Pembayaran Anda untuk pesanan di bawah ini telah kami terima (Lunas).<br><br>
+            Berikut adalah daftar produk yang Anda beli beserta tautan untuk mengunduhnya:<br>
+            ${fileLinksHTML}<br>
+            Jika tombol tidak berfungsi, silakan salin tautan (link) ke browser Anda secara manual.<br><br>
             Salam,<br><b>Januar Web Brebes</b>`;
             
             MailApp.sendEmail({
