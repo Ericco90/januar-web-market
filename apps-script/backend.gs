@@ -26,6 +26,11 @@ function doPost(e) {
     const data = JSON.parse(e.postData.contents);
     const action = data.action;
 
+    // Deteksi Webhook Midtrans
+    if (data.transaction_status) {
+      return jsonResponse(handleMidtransWebhook(data));
+    }
+
     if (action === 'createOrder') {
       return jsonResponse(createOrder(data.payload));
     } else if (action === 'adminLogin') {
@@ -166,6 +171,84 @@ function createMidtransTransaction(orderId, price, productName, name, email, pho
     Logger.log(e);
     return { token: null, error: e.toString() };
   }
+}
+
+function handleMidtransWebhook(data) {
+  // 1. Verifikasi Signature Key Keamanan Midtrans
+  const serverKey = getSetting('Midtrans_Server_Key');
+  const signatureInput = data.order_id + data.status_code + data.gross_amount + serverKey;
+  const hash = Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_512, signatureInput);
+  let hashStr = '';
+  for (let i = 0; i < hash.length; i++) {
+    let byteStr = (hash[i] < 0 ? hash[i] + 256 : hash[i]).toString(16);
+    if (byteStr.length == 1) byteStr = '0' + byteStr;
+    hashStr += byteStr;
+  }
+  
+  // Jika signature tidak valid, tolak
+  if (hashStr !== data.signature_key) {
+    return {status: 'error', message: 'Invalid signature'};
+  }
+  
+  const status = data.transaction_status;
+  const orderSheet = SpreadsheetApp.openById(SPREADSHEET_ID).getSheetByName('Order');
+  const orderData = orderSheet.getDataRange().getValues();
+  
+  if (status === 'settlement' || status === 'capture') {
+    // Pembayaran Berhasil / Lunas
+    for (let i = 1; i < orderData.length; i++) {
+      if (orderData[i][0] === data.order_id) {
+        const currentStatus = orderData[i][7]; // index 7 = status
+        if (currentStatus !== 'Lunas') {
+          // Ubah status jadi Lunas
+          orderSheet.getRange(i+1, 8).setValue('Lunas');
+          
+          const email = orderData[i][3]; // index 3 = email
+          const productName = orderData[i][5]; // index 5 = produk
+          const customerName = orderData[i][2]; // index 2 = nama
+          
+          // Cari link file produk di tab Produk
+          const productSheet = SpreadsheetApp.openById(SPREADSHEET_ID).getSheetByName('Produk');
+          const products = productSheet.getDataRange().getValues();
+          let fileLink = '';
+          for (let j = 1; j < products.length; j++) {
+            if (products[j][1] === productName) {
+              fileLink = products[j][6]; // index 6 = file
+              break;
+            }
+          }
+          
+          // Kirim Email Otomatis via Gmail API (MailApp)
+          if (email && fileLink) {
+            const subject = "Pesanan Berhasil: " + productName;
+            const body = `Halo ${customerName},<br><br>
+            Terima kasih! Pembayaran Anda untuk pesanan <b>${productName}</b> telah kami terima (Lunas).<br><br>
+            Berikut adalah tautan untuk mengakses/mendownload produk digital Anda:<br>
+            <a href="${fileLink}" style="padding:10px 20px;background:#4ECDC4;color:#fff;text-decoration:none;border-radius:5px;display:inline-block;margin-top:10px;margin-bottom:10px;">Akses Produk Saya</a><br><br>
+            Jika tombol tidak berfungsi, salin tautan berikut ke browser Anda:<br>${fileLink}<br><br>
+            Salam,<br><b>Januar Web Brebes</b>`;
+            
+            MailApp.sendEmail({
+              to: email,
+              subject: subject,
+              htmlBody: body
+            });
+          }
+        }
+        break;
+      }
+    }
+  } else if (status === 'cancel' || status === 'expire' || status === 'deny') {
+    // Pembayaran Batal/Kadaluarsa
+    for (let i = 1; i < orderData.length; i++) {
+      if (orderData[i][0] === data.order_id) {
+        orderSheet.getRange(i+1, 8).setValue('Gagal/Kadaluarsa');
+        break;
+      }
+    }
+  }
+  
+  return {status: 'success'};
 }
 
 // ================= ADMIN ENDPOINTS =================
