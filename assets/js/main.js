@@ -23,9 +23,18 @@ function initTheme() {
   }
 }
 
-// Mobile Menu (Placeholder for future expansion)
+// Mobile Menu
 function initMobileMenu() {
-  // Can be implemented for responsive nav toggle
+  const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+  const navLinks = document.querySelector('.nav-links');
+  
+  if (mobileMenuBtn && navLinks) {
+    mobileMenuBtn.addEventListener('click', () => {
+      navLinks.classList.toggle('active');
+      const isActive = navLinks.classList.contains('active');
+      mobileMenuBtn.innerHTML = isActive ? '<i class="ri-close-line"></i>' : '<i class="ri-menu-line"></i>';
+    });
+  }
 }
 
 // Utils
