@@ -328,11 +328,10 @@ footer {
 }
 
 .footer-content {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 2rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 3rem;
+  align-items: flex-start;
 }
 
 .social-links {
