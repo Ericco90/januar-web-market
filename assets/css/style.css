@@ -345,8 +345,12 @@ footer {
 
 /* Mobile Responsive */
 @media (max-width: 768px) {
-  .hero h1 { font-size: 2.5rem; }
-  .nav-links { display: none; } /* Add hamburger menu in JS later */
+  .hero h1 { font-size: 2rem; }
+  .nav-links { display: none; }
+  .logo { font-size: 1.1rem; white-space: normal; }
+  .navbar { height: auto; min-height: 70px; padding: 0.5rem 0; flex-wrap: wrap; }
+  .hero-btns { flex-direction: column; width: 100%; }
+  .hero-btns .btn { width: 100%; }
 }
 
 /* Details Page */
