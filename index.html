@@ -147,6 +147,18 @@
         <h3 style="margin-bottom: 0.5rem; font-size: 1.1rem;">Apakah file dapat diunduh ulang?</h3>
         <p style="color: var(--text-muted);">Tentu, link yang dikirimkan ke email bersifat permanen selama file tersebut tidak ditarik dari platform.</p>
       </div>
+      <div style="margin-bottom: 1rem; border: 1px solid var(--border-color); border-radius: var(--radius); padding: 1.5rem; background: var(--surface-color);">
+        <h3 style="margin-bottom: 0.5rem; font-size: 1.1rem;">Apakah produk yang dibeli mendapatkan update?</h3>
+        <p style="color: var(--text-muted);">Ya, jika ada pembaruan pada Source Code atau Template, kami akan mengirimkan file versi terbaru secara gratis ke email Anda.</p>
+      </div>
+      <div style="margin-bottom: 1rem; border: 1px solid var(--border-color); border-radius: var(--radius); padding: 1.5rem; background: var(--surface-color);">
+        <h3 style="margin-bottom: 0.5rem; font-size: 1.1rem;">Apakah aman melakukan pembayaran di sini?</h3>
+        <p style="color: var(--text-muted);">Sangat aman! Kami menggunakan gateway pembayaran resmi dari Midtrans yang menjamin keamanan data dan transaksi Anda.</p>
+      </div>
+      <div style="margin-bottom: 1rem; border: 1px solid var(--border-color); border-radius: var(--radius); padding: 1.5rem; background: var(--surface-color);">
+        <h3 style="margin-bottom: 0.5rem; font-size: 1.1rem;">Apakah ada bantuan jika file tidak bisa dibuka?</h3>
+        <p style="color: var(--text-muted);">Pasti. Jika file yang Anda unduh rusak (corrupt) atau Anda kebingungan saat pemasangan, segera hubungi WhatsApp kami untuk mendapatkan panduan.</p>
+      </div>
     </div>
   </section>
 
@@ -162,8 +174,10 @@
       <div>
         <h3 style="margin-bottom: 1rem; font-size: 1.1rem;">Hubungi Kami</h3>
         <div style="color: var(--text-muted); display: flex; flex-direction: column; gap: 0.5rem;">
-          <a href="https://wa.me/6281234567890"><i class="ri-whatsapp-line"></i> +62 812-3456-7890</a>
-          <a href="mailto:support@Januar Web Brebes.com"><i class="ri-mail-line"></i> support@Januar Web Brebes.com</a>
+          <a href="https://wa.me/6285641612901"><i class="ri-whatsapp-line"></i> +62 856-4161-2901</a>
+          <a href="mailto:support@januarweb.com"><i class="ri-mail-line"></i> support@januarweb.com</a>
+          <p style="margin-top: 0.5rem; line-height: 1.5;"><i class="ri-map-pin-line"></i> Jl. Raya Kemiriamba<br>Jatibarang, Brebes<br>Jawa Tengah</p>
+          <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3960.912662057764!2d109.0435343!3d-6.9636544!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e6fa8b9c9f7a7f7%3A0x7d6a71bb9ed517bd!2sKemiriamba%2C%20Jatibarang%2C%20Brebes%20Regency%2C%20Central%20Java!5e0!3m2!1sen!2sid!4v1700000000000!5m2!1sen!2sid" width="100%" height="120" style="border:0; border-radius:8px; margin-top:0.5rem;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
         </div>
       </div>
       <div>
@@ -228,7 +242,20 @@
 
     function renderTestimonialsList(data) {
       const tContainer = document.getElementById('testimonials');
-      tContainer.innerHTML = data.map(t => `
+      
+      // Inject 6 hardcoded testimonials if data is empty or to supplement
+      const hardcodedTestimonials = [
+        { nama: "Budi Santoso", foto: "https://via.placeholder.com/50", isi: "Template website-nya sangat responsif dan mudah dimodifikasi. Sangat menghemat waktu kerja saya sebagai freelancer!" },
+        { nama: "Siti Aminah", foto: "https://via.placeholder.com/50", isi: "Beli CV ATS di sini langsung dipanggil HRD minggu depannya. Desainnya rapi dan benar-benar lolos sistem mesin ATS." },
+        { nama: "Rizky Ramadhan", foto: "https://via.placeholder.com/50", isi: "Prompt AI yang dijual sangat spesifik dan menghasilkan gambar/konten yang luar biasa. Sangat direkomendasikan!" },
+        { nama: "Dewi Lestari", foto: "https://via.placeholder.com/50", isi: "Proses pembelian super cepat, bayar via QRIS, file langsung masuk email saat itu juga. Mantap Januar Web!" },
+        { nama: "Andi Saputra", foto: "https://via.placeholder.com/50", isi: "Source code aplikasi kasirnya lengkap dengan panduan. Walaupun saya masih pemula, saya bisa langsung menjalankannya." },
+        { nama: "Nina Wijaya", foto: "https://via.placeholder.com/50", isi: "E-book tutorialnya sangat detail dan daging semua isinya. Harganya sangat murah dibanding ilmu yang didapat." }
+      ];
+      
+      const allTestimonials = (data && data.length > 0) ? data : hardcodedTestimonials;
+
+      tContainer.innerHTML = allTestimonials.map(t => `
         <div style="background: var(--surface-color); padding: 2rem; border-radius: var(--radius); border: 1px solid var(--border-color); box-shadow: var(--card-shadow);">
           <div style="display: flex; gap: 1rem; align-items: center; margin-bottom: 1rem;">
             <img src="${t.foto || 'https://via.placeholder.com/50'}" alt="${t.nama}" style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover;" loading="lazy">
