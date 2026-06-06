@@ -188,21 +188,45 @@ function checkAdminToken(token) {
   return token && token.length > 5;
 }
 
+function uploadImageToDrive(base64Data, mimeType, fileName) {
+  const folderId = getSetting('Drive_Folder_ID');
+  if (!folderId) throw new Error("Drive_Folder_ID belum diatur di sheet Pengaturan. Silakan tambahkan ID folder Google Drive Anda.");
+  
+  const folder = DriveApp.getFolderById(folderId);
+  const blob = Utilities.newBlob(Utilities.base64Decode(base64Data), mimeType, fileName);
+  const file = folder.createFile(blob);
+  
+  file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+  return 'https://drive.google.com/uc?export=view&id=' + file.getId();
+}
+
 function addProduct(payload, token) {
   if(!checkAdminToken(token)) return {status: 'error', message: 'Unauthorized'};
+  
+  let thumbnailUrl = payload.thumbnail;
+  if(payload.imageBase64) {
+    thumbnailUrl = uploadImageToDrive(payload.imageBase64, payload.imageMimeType, payload.imageName);
+  }
+
   const sheet = SpreadsheetApp.openById(SPREADSHEET_ID).getSheetByName('Produk');
   const id = 'PRD-' + new Date().getTime();
-  sheet.appendRow([id, payload.nama, payload.kategori, payload.harga, payload.deskripsi, payload.thumbnail, payload.file, payload.status || 'Aktif']);
+  sheet.appendRow([id, payload.nama, payload.kategori, payload.harga, payload.deskripsi, thumbnailUrl, payload.file, payload.status || 'Aktif']);
   return {status: 'success', message: 'Produk ditambahkan'};
 }
 
 function updateProduct(payload, token) {
   if(!checkAdminToken(token)) return {status: 'error', message: 'Unauthorized'};
+  
+  let thumbnailUrl = payload.thumbnail;
+  if(payload.imageBase64) {
+    thumbnailUrl = uploadImageToDrive(payload.imageBase64, payload.imageMimeType, payload.imageName);
+  }
+
   const sheet = SpreadsheetApp.openById(SPREADSHEET_ID).getSheetByName('Produk');
   const data = sheet.getDataRange().getValues();
   for(let i = 1; i < data.length; i++) {
     if(data[i][0] === payload.id) {
-      sheet.getRange(i+1, 2, 1, 7).setValues([[payload.nama, payload.kategori, payload.harga, payload.deskripsi, payload.thumbnail, payload.file, payload.status]]);
+      sheet.getRange(i+1, 2, 1, 7).setValues([[payload.nama, payload.kategori, payload.harga, payload.deskripsi, thumbnailUrl, payload.file, payload.status]]);
       return {status: 'success', message: 'Produk diupdate'};
     }
   }
@@ -255,6 +279,7 @@ function initSetup() {
           sheet.appendRow(['Midtrans_Server_Key', 'SB-Mid-server-xxxxxxxxxxxx']);
           sheet.appendRow(['Midtrans_Client_Key', 'SB-Mid-client-xxxxxxxxxxxx']);
           sheet.appendRow(['Midtrans_Is_Production', 'FALSE']);
+          sheet.appendRow(['Drive_Folder_ID', 'ISI_DENGAN_ID_FOLDER_GOOGLE_DRIVE']);
         }
       } else {
         if (sheet.getLastRow() === 0) {

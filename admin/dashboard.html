@@ -146,8 +146,13 @@
           <textarea id="prod-deskripsi" class="form-control" rows="4" required></textarea>
         </div>
         <div class="form-group">
-          <label class="form-label">URL Thumbnail</label>
-          <input type="url" id="prod-thumbnail" class="form-control" required placeholder="https://...">
+          <label class="form-label">Thumbnail Produk (Upload)</label>
+          <input type="file" id="prod-thumbnail-file" class="form-control" accept="image/*">
+          <input type="hidden" id="prod-thumbnail-url">
+          <small style="color: var(--text-muted);">Biarkan kosong jika tidak ingin mengubah gambar.</small>
+          <div id="preview-thumbnail" style="margin-top: 1rem; display: none;">
+            <img id="img-preview" src="" style="max-width: 100%; height: 150px; object-fit: contain; border-radius: 8px;">
+          </div>
         </div>
         <div class="form-group">
           <label class="form-label">URL File Download</label>
@@ -266,6 +271,8 @@
     function openProductModal() {
       document.getElementById('productForm').reset();
       document.getElementById('prod-id').value = '';
+      document.getElementById('prod-thumbnail-url').value = '';
+      document.getElementById('preview-thumbnail').style.display = 'none';
       document.getElementById('modalTitle').textContent = 'Tambah Produk';
       modal.style.display = 'flex';
     }
@@ -280,17 +287,57 @@
       document.getElementById('prod-kategori').value = p.kategori;
       document.getElementById('prod-harga').value = p.harga;
       document.getElementById('prod-deskripsi').value = p.deskripsi;
-      document.getElementById('prod-thumbnail').value = p.thumbnail;
       document.getElementById('prod-file').value = p.file;
       document.getElementById('prod-status').value = p.status;
+      
+      document.getElementById('prod-thumbnail-url').value = p.thumbnail;
+      if (p.thumbnail) {
+        document.getElementById('img-preview').src = p.thumbnail;
+        document.getElementById('preview-thumbnail').style.display = 'block';
+      } else {
+        document.getElementById('preview-thumbnail').style.display = 'none';
+      }
+      
       document.getElementById('modalTitle').textContent = 'Edit Produk';
       modal.style.display = 'flex';
     }
 
+    document.getElementById('prod-thumbnail-file').addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if(file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          document.getElementById('img-preview').src = e.target.result;
+          document.getElementById('preview-thumbnail').style.display = 'block';
+        }
+        reader.readAsDataURL(file);
+      }
+    });
+
     document.getElementById('productForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       const btn = document.getElementById('btn-save-prod');
-      btn.textContent = 'Menyimpan...'; btn.disabled = true;
+      btn.textContent = 'Menyiapkan...'; btn.disabled = true;
+
+      const fileInput = document.getElementById('prod-thumbnail-file');
+      let base64Data = null;
+      let mimeType = null;
+      let fileName = null;
+
+      if(fileInput.files.length > 0) {
+        const file = fileInput.files[0];
+        fileName = file.name;
+        mimeType = file.type;
+        btn.textContent = 'Membaca Gambar...';
+        
+        base64Data = await new Promise((resolve) => {
+          const reader = new FileReader();
+          reader.onload = (e) => resolve(e.target.result.split(',')[1]); 
+          reader.readAsDataURL(file);
+        });
+      }
+
+      btn.textContent = 'Menyimpan ke Server...';
 
       const payload = {
         id: document.getElementById('prod-id').value,
@@ -298,9 +345,12 @@
         kategori: document.getElementById('prod-kategori').value,
         harga: document.getElementById('prod-harga').value,
         deskripsi: document.getElementById('prod-deskripsi').value,
-        thumbnail: document.getElementById('prod-thumbnail').value,
+        thumbnail: document.getElementById('prod-thumbnail-url').value,
         file: document.getElementById('prod-file').value,
-        status: document.getElementById('prod-status').value
+        status: document.getElementById('prod-status').value,
+        imageName: fileName,
+        imageMimeType: mimeType,
+        imageBase64: base64Data
       };
 
       let res;
