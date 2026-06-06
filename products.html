@@ -117,10 +117,12 @@
         container.innerHTML = '<div class="loader-container" style="grid-column: 1/-1;"><div class="loader"></div></div>';
       }
 
+      setupFilters(); // Setup filters first so applyFilters is defined!
+
       const res = await API.getProducts();
       if(res.status === 'success' && res.data) {
         allProducts = res.data.filter(p => p.status === 'Aktif');
-        applyFilters(); // apply filters handles rendering
+        applyFilters(); 
       } else {
         container.innerHTML = '<p>Gagal memuat produk.</p>';
       }
@@ -131,8 +133,6 @@
           applyFilters();
         }
       });
-
-      setupFilters();
     });
 
     function renderProducts(products) {
