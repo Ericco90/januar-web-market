@@ -2,31 +2,31 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
 
 :root {
-  /* Light Theme Colors - Cheerful & Youthful */
-  --primary: #FF6B6B; /* Bright Coral */
-  --primary-hover: #FF5252;
-  --bg-color: #FFF9F9; /* Very light warm tint */
+  /* Light Theme Colors - Matching Logo */
+  --primary: #0066FF; /* Vibrant Blue */
+  --primary-hover: #0052CC;
+  --bg-color: #F8FAFC; 
   --surface-color: #FFFFFF;
-  --text-main: #2D3436; /* Dark slate */
-  --text-muted: #636E72;
-  --border-color: #FFEAEA;
-  --accent: #4ECDC4; /* Mint */
-  --danger: #FF4757;
-  --card-shadow: 0 10px 30px rgba(255, 107, 107, 0.1);
-  --hover-shadow: 0 15px 35px rgba(255, 107, 107, 0.2);
-  --radius: 20px; /* Very rounded */
+  --text-main: #0F172A; 
+  --text-muted: #64748B;
+  --border-color: #E2E8F0;
+  --accent: #00D2FF; /* Cyan Accent */
+  --danger: #EF4444;
+  --card-shadow: 0 10px 30px rgba(0, 102, 255, 0.1);
+  --hover-shadow: 0 15px 35px rgba(0, 102, 255, 0.2);
+  --radius: 20px; 
   --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
 .dark {
   /* Dark Theme Colors */
-  --primary: #FF7675; 
-  --primary-hover: #FF6B6B;
-  --bg-color: #1A1A24; 
-  --surface-color: #262635; 
-  --text-main: #FDFEFE; 
-  --text-muted: #A0AAB2; 
-  --border-color: #3B3B4F;
+  --primary: #3B82F6; 
+  --primary-hover: #60A5FA;
+  --bg-color: #0B1120; 
+  --surface-color: #1E293B; 
+  --text-main: #F8FAFC; 
+  --text-muted: #94A3B8; 
+  --border-color: #334155;
   --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
   --hover-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
 }

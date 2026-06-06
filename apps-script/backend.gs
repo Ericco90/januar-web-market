@@ -168,11 +168,11 @@ function trackOrder(payload) {
   fileLinksHTML += '</ul>';
   
   if (foundCount > 0) {
-    const subject = "Pemulihan Pesanan: File Anda dari Januar Web Brebes";
+    const subject = "Pemulihan Pesanan: File Anda dari Studio Jasa Digital";
     const body = `Halo ${customerName},<br><br>
     Sesuai permintaan Anda, berikut adalah daftar tautan (link) unduhan untuk produk digital yang pernah Anda beli:<br><br>
     ${fileLinksHTML}<br>
-    Salam,<br><b>Januar Web Brebes</b>`;
+    Salam,<br><b>Studio Jasa Digital</b>`;
     
     MailApp.sendEmail({
       to: emailToTrack,
@@ -294,7 +294,7 @@ function handleMidtransWebhook(data) {
             Berikut adalah daftar produk yang Anda beli beserta tautan untuk mengunduhnya:<br>
             ${fileLinksHTML}<br>
             Jika tombol tidak berfungsi, silakan salin tautan (link) ke browser Anda secara manual.<br><br>
-            Salam,<br><b>Januar Web Brebes</b>`;
+            Salam,<br><b>Studio Jasa Digital</b>`;
             
             MailApp.sendEmail({
               to: email,
