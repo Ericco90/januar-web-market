@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Detail Produk - Digital Marketplace</title>
+  <link rel="stylesheet" href="assets/css/style.css">
+  <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+</head>
+<body>
+  <!-- Header Minimal -->
+  <header>
+    <div class="container navbar">
+      <a href="index.html" class="logo">
+        <i class="ri-store-2-line"></i> DigiMarket
+      </a>
+      <nav class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="products.html">Produk</a>
+      </nav>
+      <div class="nav-actions">
+        <button id="theme-toggle" class="theme-toggle"><i class="ri-moon-line"></i></button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container" style="padding: 4rem 1.5rem; min-height: 70vh;">
+    <div id="product-detail-container">
+      <div class="loader-container"><div class="loader"></div></div>
+    </div>
+  </main>
+
+  <script src="assets/js/api.js"></script>
+  <script src="assets/js/main.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      const productId = getQueryParam('id');
+      if(!productId) {
+        document.getElementById('product-detail-container').innerHTML = '<p>Produk tidak ditemukan.</p>';
+        return;
+      }
+
+      const res = await API.getProducts();
+      if(res.status === 'success' && res.data) {
+        const product = res.data.find(p => p.id === productId);
+        if(product) {
+          renderProductDetail(product);
+        } else {
+          document.getElementById('product-detail-container').innerHTML = '<p>Produk tidak ditemukan.</p>';
+        }
+      }
+    });
+
+    function renderProductDetail(product) {
+      document.title = product.nama + " - DigiMarket";
+      const container = document.getElementById('product-detail-container');
+      
+      container.innerHTML = `
+        <div class="detail-grid">
+          <div>
+            <img src="${product.thumbnail || 'https://via.placeholder.com/800x600'}" alt="${product.nama}" class="detail-img">
+          </div>
+          <div>
+            <span class="product-category" style="font-size: 1rem;">${product.kategori}</span>
+            <h1 style="margin-top: 0.5rem; margin-bottom: 1rem;">${product.nama}</h1>
+            <div style="font-size: 2.5rem; font-weight: 700; color: var(--primary); margin-bottom: 2rem;">
+              ${formatRupiah(product.harga)}
+            </div>
+            
+            <div style="background: var(--surface-color); padding: 1.5rem; border-radius: var(--radius); border: 1px solid var(--border-color); margin-bottom: 2rem;">
+              <h3 style="margin-bottom: 1rem;">Deskripsi Produk</h3>
+              <div style="color: var(--text-muted); line-height: 1.8; white-space: pre-wrap;">${sanitizeHTML(product.deskripsi)}</div>
+            </div>
+
+            <div style="display: flex; gap: 1rem;">
+              <a href="checkout.html?id=${product.id}" class="btn btn-primary" style="flex-grow: 1; font-size: 1.1rem; padding: 1rem;">
+                <i class="ri-shopping-cart-2-line"></i> Beli Sekarang
+              </a>
+              <button onclick="toggleWishlist('${product.id}')" class="btn btn-outline" style="padding: 1rem;">
+                <i class="ri-heart-line"></i>
+              </button>
+            </div>
+            
+            <div style="margin-top: 2rem; display: flex; gap: 1rem;">
+              <button onclick="shareWA('${product.nama}', window.location.href)" class="btn" style="background: #25D366; color: white;">
+                <i class="ri-whatsapp-line"></i> Share WhatsApp
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function shareWA(name, url) {
+      const text = encodeURIComponent(`Cek produk keren ini: ${name} di ${url}`);
+      window.open(`https://wa.me/?text=${text}`, '_blank');
+    }
+  </script>
+</body>
+</html>

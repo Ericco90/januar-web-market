@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Semua Produk - Digital Marketplace</title>
+  <link rel="stylesheet" href="assets/css/style.css">
+  <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+</head>
+<body>
+  <!-- Header Minimal -->
+  <header>
+    <div class="container navbar">
+      <a href="index.html" class="logo">
+        <i class="ri-store-2-line"></i> DigiMarket
+      </a>
+      <nav class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="products.html" style="color: var(--primary);">Produk</a>
+      </nav>
+      <div class="nav-actions">
+        <button id="theme-toggle" class="theme-toggle"><i class="ri-moon-line"></i></button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container" style="padding: 4rem 1.5rem; min-height: 70vh;">
+    <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
+      <div>
+        <h1 style="margin-bottom: 0.5rem;">Katalog Produk</h1>
+        <p style="color: var(--text-muted);">Jelajahi aset digital premium terbaik kami.</p>
+      </div>
+      
+      <!-- Search & Sort -->
+      <div style="display: flex; gap: 1rem;">
+        <div style="position: relative;">
+          <i class="ri-search-line" style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--text-muted);"></i>
+          <input type="text" id="searchInput" class="form-control" placeholder="Cari produk..." style="padding-left: 2.5rem; width: 250px;">
+        </div>
+        <select id="sortSelect" class="form-control" style="width: 200px;">
+          <option value="terbaru">Terbaru</option>
+          <option value="termurah">Harga Termurah</option>
+          <option value="termahal">Harga Termahal</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="filters" id="categoryFilters">
+      <button class="filter-btn active" data-cat="all">Semua Kategori</button>
+      <button class="filter-btn" data-cat="Template Website">Template Website</button>
+      <button class="filter-btn" data-cat="CV ATS">CV ATS</button>
+      <button class="filter-btn" data-cat="Prompt AI">Prompt AI</button>
+      <button class="filter-btn" data-cat="E-book">E-book</button>
+      <button class="filter-btn" data-cat="Source Code">Source Code</button>
+    </div>
+
+    <!-- Products Grid -->
+    <div id="products-grid" class="grid">
+      <div class="loader-container"><div class="loader"></div></div>
+    </div>
+  </main>
+
+  <footer style="margin-top: 0;">
+    <div class="container" style="text-align: center; color: var(--text-muted); font-size: 0.875rem;">
+      &copy; 2026 DigiMarket.
+    </div>
+  </footer>
+
+  <script src="assets/js/api.js"></script>
+  <script src="assets/js/main.js"></script>
+  <script>
+    let allProducts = [];
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      const res = await API.getProducts();
+      
+      if(res.status === 'success' && res.data) {
+        allProducts = res.data.filter(p => p.status === 'Aktif');
+        renderProducts(allProducts);
+      } else {
+        document.getElementById('products-grid').innerHTML = '<p>Gagal memuat produk.</p>';
+      }
+
+      setupFilters();
+    });
+
+    function renderProducts(products) {
+      const container = document.getElementById('products-grid');
+      if(products.length === 0) {
+        container.innerHTML = '<p style="grid-column: 1/-1; text-align: center;">Tidak ada produk yang sesuai.</p>';
+        return;
+      }
+
+      container.innerHTML = products.map(p => `
+        <div class="product-card">
+          <div style="position: relative;">
+            <img src="${p.thumbnail || 'https://via.placeholder.com/400x250'}" alt="${p.nama}" class="product-img">
+            ${p.bestseller ? '<span style="position: absolute; top: 1rem; left: 1rem; background: #EF4444; color: white; padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.75rem; font-weight: bold;">Bestseller</span>' : ''}
+          </div>
+          <div class="product-content">
+            <span class="product-category">${p.kategori}</span>
+            <h3 class="product-title">${p.nama}</h3>
+            <div class="product-price">${formatRupiah(p.harga)}</div>
+            <a href="product-detail.html?id=${p.id}" class="btn btn-primary" style="width: 100%;">Detail Produk</a>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function setupFilters() {
+      const searchInput = document.getElementById('searchInput');
+      const sortSelect = document.getElementById('sortSelect');
+      const filterBtns = document.querySelectorAll('.filter-btn');
+
+      let currentCat = getQueryParam('cat') || 'all';
+      let currentSearch = '';
+      let currentSort = 'terbaru';
+
+      // Pre-select category from URL if exists
+      if(currentCat !== 'all') {
+        filterBtns.forEach(b => b.classList.remove('active'));
+        const activeBtn = Array.from(filterBtns).find(b => b.dataset.cat.includes(currentCat));
+        if(activeBtn) activeBtn.classList.add('active');
+      }
+
+      const applyFilters = () => {
+        let filtered = [...allProducts];
+
+        if(currentCat !== 'all') {
+          filtered = filtered.filter(p => p.kategori.toLowerCase().includes(currentCat.toLowerCase()));
+        }
+
+        if(currentSearch) {
+          filtered = filtered.filter(p => p.nama.toLowerCase().includes(currentSearch.toLowerCase()) || p.deskripsi.toLowerCase().includes(currentSearch.toLowerCase()));
+        }
+
+        if(currentSort === 'termurah') {
+          filtered.sort((a, b) => parseInt(a.harga) - parseInt(b.harga));
+        } else if (currentSort === 'termahal') {
+          filtered.sort((a, b) => parseInt(b.harga) - parseInt(a.harga));
+        } else {
+          // 'terbaru' (assuming IDs represent creation time roughly or simply reverse)
+          filtered.reverse();
+        }
+
+        renderProducts(filtered);
+      };
+
+      filterBtns.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          filterBtns.forEach(b => b.classList.remove('active'));
+          e.target.classList.add('active');
+          currentCat = e.target.dataset.cat;
+          applyFilters();
+        });
+      });
+
+      searchInput.addEventListener('input', (e) => {
+        currentSearch = e.target.value;
+        applyFilters();
+      });
+
+      sortSelect.addEventListener('change', (e) => {
+        currentSort = e.target.value;
+        applyFilters();
+      });
+
+      // Apply initial filters if url param exists
+      if(currentCat !== 'all') applyFilters();
+    }
+  </script>
+</body>
+</html>

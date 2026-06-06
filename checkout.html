@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Checkout - Digital Marketplace</title>
+  <link rel="stylesheet" href="assets/css/style.css">
+  <!-- Midtrans Snap.js -->
+  <script src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="SB-Mid-client-xxxxxxxxxxxxx"></script>
+</head>
+<body style="background-color: var(--bg-color);">
+  <div class="container" style="max-width: 600px; padding: 4rem 1.5rem;">
+    <div style="text-align: center; margin-bottom: 2rem;">
+      <a href="index.html" class="logo" style="justify-content: center;">
+        <i class="ri-store-2-line"></i> DigiMarket
+      </a>
+      <h2 style="margin-top: 1rem;">Selesaikan Pesanan Anda</h2>
+    </div>
+
+    <div style="background: var(--surface-color); padding: 2rem; border-radius: var(--radius); box-shadow: var(--card-shadow); border: 1px solid var(--border-color);">
+      
+      <div id="order-summary" style="margin-bottom: 2rem; padding-bottom: 2rem; border-bottom: 1px solid var(--border-color);">
+        <div class="loader-container"><div class="loader"></div></div>
+      </div>
+
+      <form id="checkoutForm">
+        <div class="form-group">
+          <label class="form-label">Nama Lengkap</label>
+          <input type="text" id="name" class="form-control" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Email Aktif (Untuk pengiriman file)</label>
+          <input type="email" id="email" class="form-control" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Nomor WhatsApp</label>
+          <input type="text" id="wa" class="form-control" required placeholder="08...">
+        </div>
+        
+        <button type="submit" id="btn-pay" class="btn btn-primary" style="width: 100%; padding: 1rem; font-size: 1.1rem; margin-top: 1rem;">
+          Bayar Sekarang
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <script src="assets/js/api.js"></script>
+  <script src="assets/js/main.js"></script>
+  <script>
+    let currentProduct = null;
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      const productId = getQueryParam('id');
+      if(!productId) {
+        window.location.href = 'products.html';
+        return;
+      }
+
+      const res = await API.getProducts();
+      if(res.status === 'success' && res.data) {
+        currentProduct = res.data.find(p => p.id === productId);
+        if(currentProduct) {
+          document.getElementById('order-summary').innerHTML = `
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <div>
+                <h3 style="font-size: 1.1rem; margin-bottom: 0.25rem;">${currentProduct.nama}</h3>
+                <span class="product-category">${currentProduct.kategori}</span>
+              </div>
+              <div style="font-size: 1.25rem; font-weight: bold; color: var(--primary);">
+                ${formatRupiah(currentProduct.harga)}
+              </div>
+            </div>
+          `;
+        } else {
+          window.location.href = 'products.html';
+        }
+      }
+    });
+
+    document.getElementById('checkoutForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if(!currentProduct) return;
+
+      const btn = document.getElementById('btn-pay');
+      const originalText = btn.innerHTML;
+      btn.innerHTML = '<div class="loader" style="width:20px;height:20px;border-width:2px;"></div> Memproses...';
+      btn.disabled = true;
+
+      const payload = {
+        productId: currentProduct.id,
+        productName: currentProduct.nama,
+        price: currentProduct.harga,
+        name: document.getElementById('name').value,
+        email: document.getElementById('email').value,
+        wa: document.getElementById('wa').value
+      };
+
+      const res = await API.createOrder(payload);
+      
+      if(res.status === 'success') {
+        const snapToken = res.data.snapToken;
+        if(snapToken) {
+          snap.pay(snapToken, {
+            onSuccess: function(result){
+              window.location.href = `success.html?order_id=${res.data.orderId}&file=${encodeURIComponent(currentProduct.file)}`;
+            },
+            onPending: function(result){
+              alert("Menunggu pembayaran!");
+              btn.innerHTML = originalText;
+              btn.disabled = false;
+            },
+            onError: function(result){
+              alert("Pembayaran gagal!");
+              btn.innerHTML = originalText;
+              btn.disabled = false;
+            },
+            onClose: function(){
+              alert('Anda menutup popup sebelum menyelesaikan pembayaran');
+              btn.innerHTML = originalText;
+              btn.disabled = false;
+            }
+          });
+        } else {
+          alert('Gagal mendapatkan token pembayaran: ' + (res.data.error || 'Unknown Error'));
+          btn.innerHTML = originalText;
+          btn.disabled = false;
+        }
+      } else {
+        alert('Terjadi kesalahan sistem.');
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>

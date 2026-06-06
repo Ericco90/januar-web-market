@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pembayaran Berhasil - Digital Marketplace</title>
+  <link rel="stylesheet" href="assets/css/style.css">
+  <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+</head>
+<body style="background-color: var(--bg-color); display: flex; align-items: center; justify-content: center; min-height: 100vh;">
+
+  <div style="background: var(--surface-color); padding: 3rem; border-radius: var(--radius); box-shadow: var(--card-shadow); border: 1px solid var(--border-color); text-align: center; max-width: 500px; width: 100%;">
+    
+    <div style="width: 80px; height: 80px; background: rgba(16, 185, 129, 0.1); color: #10B981; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 3rem; margin: 0 auto 1.5rem;">
+      <i class="ri-check-line"></i>
+    </div>
+    
+    <h1 style="font-size: 1.8rem; margin-bottom: 1rem;">Pembayaran Berhasil!</h1>
+    <p style="color: var(--text-muted); margin-bottom: 2rem;">Terima kasih atas pembelian Anda. Pesanan Anda telah berhasil diproses.</p>
+    
+    <div style="background: var(--bg-color); padding: 1rem; border-radius: 8px; margin-bottom: 2rem; border: 1px dashed var(--border-color);">
+      <p style="font-size: 0.875rem; color: var(--text-muted); margin-bottom: 0.5rem;">ID Pesanan</p>
+      <div id="orderIdDisplay" style="font-weight: bold; font-family: monospace; font-size: 1.1rem;">-</div>
+    </div>
+
+    <a href="#" id="downloadLink" class="btn btn-primary" style="width: 100%; margin-bottom: 1rem;" target="_blank">
+      <i class="ri-download-cloud-2-line"></i> Download Produk
+    </a>
+    
+    <a href="index.html" class="btn btn-outline" style="width: 100%;">
+      Kembali ke Beranda
+    </a>
+
+  </div>
+
+  <script src="assets/js/main.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const orderId = getQueryParam('order_id');
+      const fileUrl = getQueryParam('file');
+      
+      if(orderId) document.getElementById('orderIdDisplay').textContent = orderId;
+      
+      const dlLink = document.getElementById('downloadLink');
+      if(fileUrl && fileUrl !== 'undefined') {
+        dlLink.href = decodeURIComponent(fileUrl);
+      } else {
+        dlLink.style.display = 'none';
+      }
+
+      // Hapus data wishlist atau cart jika diperlukan
+    });
+  </script>
+</body>
+</html>
