@@ -149,4 +149,7 @@ tr:last-child td {
   border: 1px solid var(--border-color);
   width: 100%;
   max-width: 400px;
+  position: relative;
+  z-index: 9999;
+  pointer-events: auto;
 }
